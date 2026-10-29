@@ -1,0 +1,2934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marelli Lighting Manufacturing North America</title>
+
+<!-- Vista previa para Links (MS Teams, Outlook, WhatsApp) -->
+<meta property="og:title" content="Marelli Lighting North America | Manufacturing Footprint">
+<meta property="og:description" content="Interactive Dashboard & AHEAD 2031 Vision.">
+<meta property="og:image" content="Other/AHEAD.png">
+<meta property="og:type" content="website">
+
+<!-- Favicon -->
+<link rel="icon" href="Other/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- D3.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+
+<style>
+:root {
+    --marelli-cyan: #00A6E7;
+    --marelli-dark: #041420;
+    --marelli-navy: #002855;
+    --card-bg: rgba(255, 255, 255, 0.03);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--marelli-dark);
+    color: white;
+    overflow-x: hidden;
+    user-select: none;
+}
+
+/* =====================================================
+   VIDEO DE FONDO GLOBAL
+===================================================== */
+.global-bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; 
+    pointer-events: none; 
+    opacity: 0.15; 
+}
+.global-bg-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* =====================================================
+   HEADER & FOOTER LOGOS
+===================================================== */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1001;
+    background: linear-gradient(to bottom, rgba(4,20,32,0.95) 0%, rgba(4,20,32,0) 100%);
+}
+
+.header-logo, .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-logo a, .footer-logo a {
+    display: block;
+}
+
+.marelli-logo {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: transform 0.3s ease;
+}
+
+.footer-logo .marelli-logo {
+    height: 45px;
+}
+
+.header-logo img:hover, .footer-logo img:hover {
+    transform: scale(1.05);
+}
+
+.logo-separator {
+    width: 1px;
+    height: 35px;
+    background-color: rgba(255,255,255,0.2);
+}
+
+.ahead-logo-img {
+    height: 38px;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.ahead-logo-img:hover {
+    transform: scale(1.05);
+}
+
+/* =====================================================
+   MENÚ PILL
+===================================================== */
+.main-nav {
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 40px;
+    padding: 10px 35px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+    margin: 0;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.main-nav a:hover, .main-nav a.active {
+    color: var(--marelli-cyan);
+}
+
+.nav-item {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 10px 0;
+    margin-top: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    min-width: 220px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.nav-item:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    margin-top: 15px;
+}
+
+.dropdown-menu li {
+    list-style: none;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 12px 25px;
+    font-size: 0.85rem;
+    color: white;
+    white-space: nowrap;
+}
+
+.dropdown-menu a:hover, .dropdown-menu a.active {
+    background: rgba(255,255,255,0.1);
+    color: var(--marelli-cyan);
+}
+
+.dropdown-header {
+    font-size: 0.65rem;
+    color: #88929b;
+    padding: 10px 25px 5px 25px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.dropdown-divider {
+    border: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+    margin: 8px 0;
+}
+
+/* =====================================================
+   CONTROLES DERECHOS
+===================================================== */
+.right-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tour-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.narration-btn {
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    color: white;
+    padding: 8px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.narration-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--marelli-cyan);
+    border-color: var(--marelli-cyan);
+}
+
+.narration-btn.active {
+    color: var(--marelli-cyan);
+    border-color: var(--marelli-cyan);
+    box-shadow: 0 0 15px rgba(0,166,231,0.4);
+    background: rgba(0, 166, 231, 0.1);
+}
+
+#narrationBtnText {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.stop-btn {
+    padding: 8px 12px;
+    border-radius: 50%;
+    display: none;
+}
+
+.lang-selector {
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    color: white;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.lang-selector:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    margin-top: 10px;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.search-input {
+    width: 0;
+    opacity: 0;
+    padding: 0;
+    transition: all 0.4s ease;
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    color: white;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.search-input.active {
+    width: 220px;
+    opacity: 1;
+    padding: 8px 30px 8px 15px;
+}
+
+.search-input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.search-clear {
+    position: absolute;
+    right: 55px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.6);
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.search-clear.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.search-clear:hover {
+    color: var(--marelli-cyan);
+}
+
+.search-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    z-index: 2;
+}
+
+.search-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    right: 48px;
+    margin-top: 15px;
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.search-results.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.search-result-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    text-align: left;
+}
+
+.search-result-item:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.search-result-item h4 {
+    color: var(--marelli-cyan);
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+}
+
+.search-result-item p {
+    color: #D9E2EA;
+    font-size: 0.7rem;
+}
+
+/* =====================================================
+   BLUR GLOBAL DEL FONDO
+===================================================== */
+.footer-blur-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 20, 32, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.footer-blur-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* =====================================================
+   MAPA D3 (GLOBE) Y PINES
+===================================================== */
+.globe-container {
+    position: fixed;
+    top: 50%;
+    left: 73%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    z-index: 1;
+    background-color: transparent;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+#globe {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: transparent;
+}
+
+.pin-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 20;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.pin-dot {
+    width: 14px;
+    height: 14px;
+    background-color: var(--marelli-cyan);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 15px var(--marelli-cyan);
+    animation: pulse 1.5s infinite;
+}
+
+.pin-label {
+    margin-top: 8px;
+    background: rgba(0, 40, 85, 0.85);
+    padding: 5px 12px;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(0, 166, 231, 0.5);
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+}
+
+/* =====================================================
+   RELOJ Y OTROS WIDGETS
+===================================================== */
+.local-time-display {
+    position: fixed;
+    bottom: 40px;
+    left: 73%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(4, 20, 32, 0.9);
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: 1px solid rgba(0, 166, 231, 0.4);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #D9E2EA;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.local-time-display.visible {
+    opacity: 1;
+}
+
+#time-clock {
+    font-weight: 700;
+    color: var(--marelli-cyan);
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 166, 231, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 166, 231, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 166, 231, 0); }
+}
+
+.scroll-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--marelli-cyan);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 900;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.scroll-top-btn.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.scroll-top-btn:hover {
+    background-color: #008cc4;
+    transform: translateY(-3px);
+}
+
+/* =====================================================
+   PANELES Y TEXTOS GENERALES
+===================================================== */
+.panel {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    scroll-snap-align: start;
+}
+
+.content {
+    width: 66%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 30;
+}
+
+h1 {
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    line-height: 1.1;
+    color: white;
+    margin-bottom: 20px;
+}
+
+h1 span {
+    color: var(--marelli-cyan);
+}
+
+h2 {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: var(--marelli-cyan);
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+p {
+    color: #D9E2EA;
+    line-height: 1.6;
+    max-width: 600px;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+.location-tag {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    background: var(--marelli-cyan);
+    color: white;
+    border-radius: 50px;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.kpi {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 1000px;
+}
+
+.kpi-box h3 {
+    color: var(--marelli-cyan);
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-box span {
+    color: #D9E2EA;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.btn-details {
+    margin-top: 25px;
+    padding: 10px 25px;
+    background-color: var(--marelli-cyan);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-details:hover {
+    background-color: #008cc4;
+}
+
+/* =====================================================
+   SECCIÓN VISIÓN (AHEAD)
+===================================================== */
+.vision-panel {
+    position: relative;
+    width: 100%;
+    background: rgba(4, 20, 32, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 25;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 5%;
+}
+
+.vision-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1600px;
+    position: relative;
+    z-index: 50;
+}
+
+.damian-card {
+    flex: 0 0 340px;
+    height: 460px;
+    border-radius: 16px;
+    background: #1a2634;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 25px 0 50px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
+    z-index: 30;
+    margin-right: -45px;
+    transition: transform 0.3s ease;
+}
+
+.damian-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--marelli-cyan);
+}
+
+.damian-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+}
+
+.damian-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+    padding: 40px 20px 20px 20px;
+    text-align: left;
+}
+
+.damian-info h3 {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.damian-info p {
+    color: var(--marelli-cyan);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.ahead-card {
+    flex: 0 0 580px;
+    height: 414px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 40px 40px 40px 75px;
+    box-shadow: 20px 0 40px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.5);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 20;
+    margin-right: -8px;
+}
+
+.ahead-card .ahead-original-logo {
+    max-width: 210px;
+    margin-bottom: 20px;
+    object-fit: contain;
+}
+
+.ahead-card p {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin: 0;
+    color: #000000;
+    text-align: justify;
+}
+
+.video-card-16-9 {
+    flex: 0 0 736px;
+    height: 414px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.video-card-16-9 video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+/* =====================================================
+   FULLSCREEN VIDEO MODAL
+===================================================== */
+.fullscreen-video-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.fullscreen-video-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.fullscreen-video-modal video {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    outline: none;
+}
+
+.close-video-btn {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 2.5rem;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 10001;
+    line-height: 1;
+}
+
+.close-video-btn:hover {
+    color: var(--marelli-cyan);
+}
+
+/* =====================================================
+   VISTA DE DETALLES DE PLANTAS E ÍCONOS
+===================================================== */
+#details-view {
+    width: 100%;
+    max-width: 1700px;
+    margin: 0 auto;
+    padding: 100px 50px 80px 100px; 
+    position: relative;
+    min-height: calc(100vh - 200px);
+    z-index: 30;
+    animation: fadeIn 0.4s ease;
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* BOTÓN BACK (Integrado al nivel del título) */
+.circle-back-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--marelli-cyan);
+    color: var(--marelli-cyan);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.circle-back-btn:hover {
+    background: var(--marelli-cyan);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* CABECERA ESTÁTICA TRANSPARENTE BORROSA (FROSTED GLASS) */
+.modal-header-wrapper {
+    position: sticky;
+    top: 85px; /* Se congela justo debajo del menú principal */
+    background: rgba(4, 20, 32, 0.4); /* Fondo transparente oscuro */
+    backdrop-filter: blur(16px); /* El efecto mágico de cristal borroso */
+    -webkit-backdrop-filter: blur(16px);
+    padding: 15px 25px; /* Espaciado interno */
+    margin-bottom: 30px;
+    border-radius: 16px; /* Bordes redondeados modernos */
+    border: 1px solid rgba(0, 166, 231, 0.2); /* Borde sutil cyan */
+    z-index: 100;
+    display: flex; /* Alinea el botón y los textos en el mismo renglón */
+    align-items: center;
+    gap: 20px; /* Separación entre el botón back y el título */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-header-text {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    flex-wrap: wrap;
+    text-align: left;
+    width: 100%;
+}
+
+.modal-header-text h2 {
+    font-size: 2.2rem;
+    margin: 0;
+    color: var(--marelli-cyan);
+    line-height: 1;
+}
+
+.modal-header-text p {
+    font-size: 1.05rem;
+    color: #D9E2EA;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.detail-time-badge {
+    font-size: 0.75rem;
+    background: rgba(0, 166, 231, 0.1);
+    border: 1px solid var(--marelli-cyan);
+    color: var(--marelli-cyan);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: stretch;
+}
+
+.dash-col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.plant-hero-img {
+    width: 100%;
+    height: 260px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+
+.slide-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.slide-bg.active {
+    opacity: 1;
+}
+
+.slide-overlay-text {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0px 2px 4px rgba(0,0,0,0.8);
+    font-weight: 600;
+    z-index: 10;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: 45fr 55fr; 
+    gap: 15px;
+}
+
+.modal-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =====================================================
+   NUEVA SECCIÓN DE VIDEOS DE PROCESO
+===================================================== */
+.process-videos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 40px;
+    width: 100%;
+}
+
+.process-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.process-card h4 {
+    color: var(--marelli-cyan);
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.process-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.process-tag {
+    background: rgba(255,255,255,0.1);
+    color: #D9E2EA;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.process-player-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =====================================================
+   ÍCONOS SVG: FILTRO BLANCO PURO
+===================================================== */
+.card-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    vertical-align: middle;
+    filter: brightness(0) invert(1);
+}
+
+.inline-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: middle;
+    filter: brightness(0) invert(1);
+}
+
+.modal-card h3 {
+    color: var(--marelli-cyan); /* TÍTULOS EN CYAN */
+    font-size: 1.05rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.modal-list {
+    list-style: none;
+    color: #D9E2EA;
+    line-height: 1.8;
+    font-size: 0.9rem;
+}
+
+.modal-list li {
+    margin-bottom: 6px;
+    padding-left: 15px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.modal-list li::before {
+    content: "•";
+    color: var(--marelli-cyan);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.customers-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.customer-logo-container {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.customer-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    background-size: 70%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.customer-logo-container:hover .customer-logo {
+    border-color: var(--marelli-cyan);
+    transform: scale(1.15);
+    box-shadow: 0 4px 15px rgba(0,166,231,0.3);
+}
+
+.coming-badge {
+    background: #E7004C;
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: absolute;
+    bottom: -8px;
+    white-space: nowrap;
+    z-index: 5;
+    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.logo-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 20, 32, 0.95);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+}
+
+.logo-lightbox.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.logo-lightbox-content {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background-color: white;
+    border: 4px solid var(--marelli-cyan);
+    background-size: 70%;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 6rem;
+    font-weight: bold;
+    color: #000;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.6);
+    transform: scale(0.8);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.logo-lightbox.active .logo-lightbox-content {
+    transform: scale(1);
+}
+
+.logo-lightbox-title {
+    margin-top: 30px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.dash-col-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.promo-video-container.huge-video {
+    flex-grow: 1;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: #000;
+    position: relative;
+    min-height: 400px;
+}
+
+.promo-video-container.huge-video::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, var(--marelli-dark) -2%, transparent 20%, transparent 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* =====================================================
+   FOOTER CORPORATIVO
+===================================================== */
+.site-footer {
+    width: 100%;
+    background-color: rgba(0,0,0,0.85);
+    padding: 80px 10% 40px 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+    scroll-snap-align: start;
+    min-height: auto !important;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    z-index: 50;
+    position: relative;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 30px;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.footer-col {
+    text-align: left;
+}
+
+.footer-col h4 {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.footer-col p, .footer-col a {
+    color: #88929b;
+    font-size: 0.8rem;
+    line-height: 2;
+    text-decoration: none;
+    display: block;
+    transition: color 0.3s;
+}
+
+.footer-col a:hover {
+    color: var(--marelli-cyan);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 25px;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-bottom p {
+    color: #88929b;
+    font-size: 0.7rem;
+    margin: 0;
+}
+
+.footer-signature-bottom {
+    color: #88929b !important;
+    font-weight: 400;
+    font-size: 0.7rem !important;
+}
+
+/* =====================================================
+   ESTILO PARA LA FIRMA DEL DESARROLLADOR
+===================================================== */
+.dev-link {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.dev-link:hover {
+    color: var(--marelli-cyan);
+}
+
+/* =====================================================
+   SCROLLBAR CORPORATIVO
+===================================================== */
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: #FFFFFF; /* Fondo blanco */
+}
+::-webkit-scrollbar-thumb {
+    background: var(--marelli-cyan); /* Azul cyan */
+    border-radius: 6px;
+    border: 3px solid #FFFFFF; /* Borde interior blanco */
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #008cc4; /* Cyan oscuro al pasar el cursor */
+}
+
+/* =====================================================
+   DISEÑO RESPONSIVO (TABLETS Y MÓVILES)
+===================================================== */
+@media(max-width:1100px){ 
+    .globe-container { left: 50%; width: 600px; height: 600px; z-index: 0; opacity: 0.3; } 
+    .content { width: 100%; padding: 10%; } 
+    .site-header { flex-direction: column; gap: 20px; padding: 15px; } 
+    #details-view { padding: 150px 30px 50px 80px; } 
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .local-time-display { display: none; }
+    .vision-container { flex-direction: column; gap: 20px; }
+    .damian-card, .ahead-card, .video-card-16-9 { margin: 0; width: 100%; max-width: 600px; }
+    .ahead-card { padding: 40px 30px; height: auto;}
+    .video-card-16-9 { height: auto; aspect-ratio: 16/9; padding-left: 0; }
+    
+    /* Adaptar los videos de procesos a 1 columna en móviles */
+    .process-videos-grid { 
+        grid-template-columns: 1fr; 
+    }
+}
+</style>
+</head>
+<body id="top">
+
+<!-- REPRODUCTOR BGM TOUR -->
+<audio id="tour-bgm" loop>
+    <source src="Music/tour-bgm.mp3" type="audio/mpeg">
+</audio>
+
+<!-- AQUÍ SE AGREGA EL VIDEO DE FONDO GLOBAL -->
+<div class="global-bg-video">
+    <video autoplay loop muted playsinline>
+        <source src="Video/In.mp4" type="video/mp4">
+    </video>
+</div>
+
+<div class="footer-blur-overlay" id="footerBlur"></div>
+
+<!-- REPRODUCTOR FULLSCREEN VIDEO -->
+<div id="fullscreen-video-modal" class="fullscreen-video-modal" onclick="closeVideoModal(event)">
+    <span class="close-video-btn" onclick="closeVideoModal()">&times;</span>
+    <video id="fullscreen-video-player" controls>
+        <source src="" type="video/mp4">
+    </video>
+</div>
+
+<header class="site-header">
+    <div class="header-logo">
+        <a href="https://www.marelli.com/" target="_blank">
+            <img class="marelli-logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjguNTEgMzAwLjUiPgogIDxwYXRoIGQ9Ik0xODQuMjU0IDEwNi4zNzkgMCAwdjIxMi43NTlsNTkuMjM0LTM0LjJ2LTc1Ljk2bDY1Ljc4IDM3Ljk4em0wIDBMMzY4LjUwNCAwdjIxMi43NTlsLTU5LjI0LTM0LjJ2LTc1Ljk2bC02NS43NyAzNy45OHoiIGZpbGw9IiMwMDljZGUiPjwvcGF0aD4KICA8cGF0aCBkPSJNMCAyNDIuNjI5aDE0LjA0OGwxNS41NzIgMjQuNDczIDE1LjU3Mi0yNC40NzNoMTQuMDQydjU3Ljg3Nkg0Ni4yOTJ2LTM3LjI1bC0xNi42NzIgMjQuNzJoLS4zMzlsLTE2LjUtMjQuNDc0djM3SDB6bTkxLjUyNCAwaDExLjk4NGwyNS4zMiA1Ny44NzZoLTEzLjU5MmwtNS4yMjEtMTIuMTE2SDg0LjY2M2wtNS4yMSAxMi4xMTZINjYuMjA0em0xMy44NTIgMzQuNTE2LTguMDMxLTE5LjIyLTguMDM5IDE5LjIyem0zMC41MTgtMzQuNTE2aDI3LjQxNGM3LjYyNSAwIDEzLjUzNyAyLjA2NyAxNy40NzcgNS44NyAzLjM0MSAzLjIyNCA1LjEzOSA4IDUuMTM5IDEzLjQ1NXYuMTY0YzAgOS4zNDUtNS4yMjQgMTUuNDQxLTEyLjg0OSAxOC4xNjlsMTQuNjUgMjAuMjE4aC0xNS40MmwtMTIuODUyLTE4LjA2OWgtMTAuMzY2djE4LjA2OWgtMTMuMTkzem0yNi41NTkgMjguNTYzYzYuNDIzIDAgMTAuMTA4LTMuNTMyIDEwLjEwOC04LjQxM3YtLjE2NGMwLTUuNDU3LTMuOTQtOC41LTEwLjM2Ni04LjVoLTEzLjEwOHYxNy4wNzN6bTM1LjAyMS0yOC41NjNoNDQuNTU5djExLjMyNmgtMzEuNjQ2djExLjc0aDI3Ljg1M3YxMS4zM2gtMjcuODUzdjEyLjE1OGgzMi4wNzF2MTEuMzI2aC00NC45ODR6bTU2LjQzIDBoMTN2NDYuM2gyOS4wMDZ2MTEuNTc2aC00Mi4wMDZ6bTUxLjIzIDBoMTN2NDYuM2gyOS4wMXYxMS41NzZoLTQyLjAxem01MC4zNyAwaDEzdjU3Ljg3NmgtMTN6IiBmaWxsPSIjMDAyODU1Ij48L3BhdGg+Cjwvc3ZnPgo=" alt="Marelli">
+        </a>
+        <div class="logo-separator header-sep" style="display:block;"></div>
+        <a href="#sec-vision" onclick="instantNavigate(event, 'sec-vision')" title="Go to AHEAD" class="ahead-logo-link" style="display:block;">
+            <img id="headerAheadLogo" src="Other/AHEAD.png" class="ahead-logo-img" alt="AHEAD">
+        </a>
+    </div>
+    
+    <nav class="main-nav">
+        <ul>
+            <li><a href="#sec-hero" data-i18n="nav_nafta" onclick="instantNavigate(event, 'sec-hero')">NAFTA</a></li>
+            <li><a href="#sec-footprint" data-i18n="nav_footprint" onclick="instantNavigate(event, 'sec-footprint')">Footprint</a></li>
+            <li><a href="#sec-countries" data-i18n="nav_countries" onclick="instantNavigate(event, 'sec-countries')">Countries</a></li>
+            <li class="nav-item">
+                <a href="#" data-i18n="nav_plants" onclick="return false;">Plants</a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-header" data-i18n="tag_usa">UNITED STATES</li>
+                    <li><a href="#sec-pulaski" onclick="instantNavigate(event, 'sec-pulaski')">ALUS-PU (Pulaski)</a></li>
+                    <hr class="dropdown-divider">
+                    <li class="dropdown-header" data-i18n="tag_mex">MEXICO</li>
+                    <li><a href="#sec-juarez1" onclick="instantNavigate(event, 'sec-juarez1')">ALMX-JU1 (Juárez I)</a></li>
+                    <li><a href="#sec-juarez2" onclick="instantNavigate(event, 'sec-juarez2')">ALMX-JU2 (Juárez II)</a></li>
+                    <li><a href="#sec-toluca" onclick="instantNavigate(event, 'sec-toluca')">ALMX-TO (Toluca)</a></li>
+                    <li><a href="#sec-tepotzotlan" onclick="instantNavigate(event, 'sec-tepotzotlan')">ALMX-TE (Tepotzotlán)</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" data-i18n="nav_offices" onclick="return false;">Headquarters</a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-header" data-i18n="tag_usa">UNITED STATES</li>
+                    <li><a href="#sec-southfield" onclick="instantNavigate(event, 'sec-southfield')">HC Southfield</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" data-i18n="nav_tech" onclick="return false;">Tech Centers</a>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-header" data-i18n="tag_mex">MEXICO</li>
+                    <li><a href="#sec-mtc" onclick="instantNavigate(event, 'sec-mtc')">MTC Mexico</a></li>
+                </ul>
+            </li>
+            <li><a href="#sec-vision" data-i18n="nav_ahead" onclick="instantNavigate(event, 'sec-vision')">AHEAD</a></li>
+        </ul>
+    </nav>
+
+    <div class="right-controls">
+        <div class="tour-controls">
+            <button id="tourPlayPauseBtn" class="narration-btn" onclick="toggleTourPlayPause()" title="Play/Pause Tour">
+                <svg id="tourPlayIcon" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <span id="tourBtnText" data-i18n="btn_start_tour" style="margin-left: 5px; font-weight: 600; font-size: 0.85rem;">Start Tour</span>
+            </button>
+            <button id="tourStopBtn" class="narration-btn stop-btn" onclick="stopTour()" title="Stop Tour">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+            </button>
+        </div>
+
+        <div class="lang-selector">
+            <span id="current-lang">EN</span> <span style="font-size:0.6rem;">▼</span>
+            <ul class="dropdown-menu" style="min-width: 80px; left: auto; right: 0; transform: none; top: 100%; margin-top: 15px;">
+                <li><a href="#" onclick="setLanguage('EN'); return false;">EN</a></li>
+                <li><a href="#" onclick="setLanguage('ES'); return false;">ES</a></li>
+                <li><a href="#" onclick="setLanguage('IT'); return false;">IT</a></li>
+                <li><a href="#" onclick="setLanguage('CN'); return false;">CN</a></li>
+                <li><a href="#" onclick="setLanguage('PL'); return false;">PL</a></li>
+            </ul>
+        </div>
+        
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Search..." autocomplete="off">
+            <span id="searchClear" class="search-clear" onclick="clearSearch()">&times;</span>
+            <button class="search-btn" onclick="toggleSearch()">
+                <svg width="18" height="18" fill="white" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
+            </button>
+            <div id="searchResults" class="search-results"></div>
+        </div>
+    </div>
+</header>
+
+<div id="local-time-display" class="local-time-display">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    <span id="time-zone-label">NA Headquarters</span>: <span id="time-clock">--:--:--</span>
+</div>
+
+<div id="logo-lightbox" class="logo-lightbox" onclick="closeLogoLightbox()">
+    <div class="logo-lightbox-content" id="logo-lightbox-img"></div>
+    <div class="logo-lightbox-title" id="logo-lightbox-title"></div>
+</div>
+
+<div id="details-view">
+    
+    <!-- CABECERA ESTÁTICA CON EFECTO CRISTAL -->
+    <div class="modal-header-wrapper">
+        <!-- EL BOTÓN AHORA VIVE AQUÍ ADENTRO, JUNTO AL TÍTULO -->
+        <button class="circle-back-btn" onclick="closeModal(true)" title="Back to Map">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        
+        <div class="modal-header-text">
+            <h2 id="modalTitle">Plant Name</h2>
+            <p>
+                <span id="modalLocation">Location</span>
+                <span class="detail-time-badge" id="modalLocalTime">--:--</span>
+            </p>
+        </div>
+    </div>
+    
+    <!-- CONTENIDO GENERAL -->
+    <div class="dashboard-grid">
+        <div class="dash-col-left">
+            <div class="plant-hero-img" id="modalPlantImage"></div>
+            <div class="cards-grid">
+                <div class="modal-card">
+                    <h3><img src="Other/Surface.svg" class="card-icon" alt="Surface"> <span data-i18n="mod_surface">Surface Area</span></h3>
+                    <ul class="modal-list" id="modalSurface"></ul>
+                </div>
+                <div class="modal-card">
+                    <h3><img src="Other/Capabilities.svg" class="card-icon" alt="Capabilities"> <span data-i18n="mod_cap">Manufacturing Capabilities</span></h3>
+                    <ul class="modal-list" id="modalCapabilities"></ul>
+                </div>
+                <div class="modal-card">
+                    <h3><img src="Other/Staff.svg" class="card-icon" alt="Staff"> <span data-i18n="mod_staff">Staff & Headcount</span></h3>
+                    <ul class="modal-list" id="modalStaff"></ul>
+                </div>
+                <div class="modal-card" id="modalCustomersCard"> 
+                    <h3><img src="Other/Customers.svg" class="card-icon" alt="Customers"> <span data-i18n="mod_cust">Main Customers</span></h3>
+                    <div class="customers-grid" id="modalCustomers"></div>
+                </div>
+            </div>
+        </div>
+        <div class="dash-col-right">
+            <div class="promo-video-container huge-video" id="modalVideoContainer"></div>
+        </div>
+    </div>
+    
+    <!-- NUEVA SECCIÓN DE VIDEOS DE PROCESOS -->
+    <div class="process-videos-grid" id="modalProcessVideos" style="display: none;">
+        <!-- Injection Molding -->
+        <div class="process-card">
+            <h4>Injection Molding</h4>
+            <div class="process-tags">
+                <span class="process-tag">Molding</span>
+            </div>
+            <div class="process-player-container" id="player-molding"></div>
+        </div>
+        <!-- Coating -->
+        <div class="process-card">
+            <h4>Coating</h4>
+            <div class="process-tags">
+                <span class="process-tag">Hard Coating</span>
+                <span class="process-tag">Anti-fog Coating</span>
+                <span class="process-tag">Metallization</span>
+            </div>
+            <div class="process-player-container" id="player-coating"></div>
+        </div>
+        <!-- Assembly Line -->
+        <div class="process-card">
+            <h4>Assembly Line</h4>
+            <div class="process-tags">
+                <span class="process-tag">Module Assembly</span>
+                <span class="process-tag">Welding</span>
+                <span class="process-tag">Functional Testing</span>
+                <span class="process-tag">Automation</span>
+            </div>
+            <div class="process-player-container" id="player-assembly"></div>
+        </div>
+    </div>
+</div>
+
+<main id="main-view">
+    <div class="globe-container" id="globe-container">
+        <div id="globe"></div>
+        <div class="pin-container" id="pinContainer">
+            <div class="pin-dot"></div>
+            <div class="pin-label" id="pinLabel">Location</div>
+        </div>
+    </div>
+
+    <section id="sec-hero" class="panel" data-lon="-95.00" data-lat="38.00" data-zoom="1" data-country="NONE" data-label="">
+        <div class="content">
+            <h1 data-i18n="hero_title">Welcome to<br>Marelli Lighting<br><span>North America</span></h1>
+            <p data-i18n="hero_desc">Marelli Manufacturing Footprint Across United States and Mexico.</p>
+        </div>
+    </section>
+    
+    <section id="sec-footprint" class="panel" data-lon="-95.00" data-lat="38.00" data-zoom="1.2" data-country="USA,MEX" data-label="">
+        <div class="content">
+            <h2 data-i18n="foot_title">Manufacturing Footprint</h2>
+            <div class="kpi">
+                <div class="kpi-box"><h3>5</h3><span data-i18n="kpi_assembly">Assembly Plants</span></div>
+                <div class="kpi-box"><h3>1</h3><span data-i18n="kpi_office">Headquarters</span></div>
+                <div class="kpi-box"><h3>1</h3><span data-i18n="kpi_tech">Tech Center</span></div>
+                <div class="kpi-box"><h3>3,981</h3><span data-i18n="kpi_emp">Employees</span></div>
+                <div class="kpi-box"><h3>2</h3><span data-i18n="kpi_countries">Countries</span></div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="sec-countries" class="panel" data-lon="-95.00" data-lat="38.00" data-zoom="1.2" data-country="USA,MEX" data-label="">
+        <div class="content">
+            <h2 data-i18n="countries_title" style="font-size: 3.5rem; color: var(--marelli-cyan);">United States & Mexico</h2>
+            <p data-i18n="countries_desc">Strategic locations powering the North American automotive sector with cutting-edge technology and unparalleled logistics.</p>
+        </div>
+    </section>
+
+    <section id="sec-pulaski" class="panel" data-lon="-86.80" data-lat="34.90" data-zoom="4" data-country="USA" data-label="Pulaski, TN" data-tz="America/Chicago" data-tzlabel="Pulaski, TN (CST)">
+        <div class="content">
+            <div class="location-tag" data-i18n="tag_usa">UNITED STATES</div>
+            <h2>ALUS-PU</h2>
+            <h4 class="subtitle" data-i18n="sub_mfg_assembly">Assembly Plant</h4>
+            <p>Pulaski, Tennessee</p>
+            <p data-i18n="desc_pu">Production Plant for Head & Rear Lamps</p>
+            <button class="btn-details" data-i18n="btn_details" onclick="openModal('ALUS-PU')">View Details</button>
+        </div>
+    </section>
+
+    <section id="sec-southfield" class="panel" data-lon="-83.22" data-lat="42.47" data-zoom="4" data-country="USA" data-label="Southfield, MI" data-tz="America/Detroit" data-tzlabel="Southfield, MI (EST)">
+        <div class="content">
+            <div class="location-tag" data-i18n="tag_usa">UNITED STATES</div>
+            <h2>HC Southfield</h2>
+            <h4 class="subtitle" data-i18n="sub_corp_office">Headquarters</h4>
+            <p>Southfield, Michigan</p>
+            <p data-i18n="desc_sf">Regional Headquarters</p>
+            <button class="btn-details" data-i18n="btn_details" onclick="openModal('SOUTHFIELD')">View Details</button>
+        </div>
+    </section>
+
+    <section id="sec-juarez1" class="panel" data-lon="-106.42" data-lat="30.90" data-zoom="4.5" data-country="MEX" data-label="Juárez I" data-tz="America/Ciudad_Juarez" data-tzlabel="Ciudad Juárez (MST)">
+        <div class="content">
+            <div class="location-tag" data-i18n="tag_mex">MEXICO</div>
+            <h2>ALMX-JU1</h2>
+            <h4 class="subtitle" data-i18n="sub_mfg_assembly">Assembly Plant</h4>
+            <p>Juárez, Chihuahua</p>
+            <p data-i18n="desc_ju1">Production Plant for Head & Rear Lamps and Modules</p>
+            <button class="btn-details" data-i18n="btn_details" onclick="openModal('ALMX-JU1')">View Details</button>
+        </div>
+    </section>
+
+    <section id="sec-juarez2" class="panel" data-lon="-106.40" data-lat="30.85" data-zoom="5" data-country="MEX" data-label="Juárez II" data-tz="America/Ciudad_Juarez" data-tzlabel="Ciudad Juárez (MST)">
+        <div class="content">
+            <div class="location-tag" data-i18n="tag_mex">MEXICO</div>
+            <h2>ALMX-JU2</h2>
+            <h4 class="subtitle" data-i18n="sub_mfg_assembly">Assembly Plant</h4>
+            <p>Juárez, Chihuahua</p>
+            <p data-i18n="desc_ju2">Production Plant for Head & Rear Lamps</p>
+            <button class="btn-details" data-i18n="btn_details" onclick="openModal('ALMX-JU2')">View Details</button>
+        </div>
+    </section>
+
+    <section id="sec-toluca" class="panel" data-lon="-99.50" data-lat="19.28" data-zoom="4.5" data-country="MEX" data-label="Toluca" data-tz="America/Mexico_City" data-tzlabel="Toluca, EDOMEX (CST)">
+        <div class="content">
+            <div class="location-tag" data-i18n="tag_mex">MEXICO</div>
+            <h2>ALMX-TO</h2>
+            <h4 class="subtitle" data-i18n="sub_mfg_assembly">Assembly Plant</h4>
+            <p>Toluca, Estado de México</p>
+            <p data-i18n="desc_to">Production Plant for Head & Rear Lamps</p>
+            <button class="btn-details" data-i18n="btn_details" onclick="openModal('ALMX-TO')">View Details</button>
+        </div>
+    </section>
+
+    <section id="sec-tepotzotlan" class="panel" data-lon="-99.21" data-lat="19.71" data-zoom="4.5" data-country="MEX" data-label="Tepotzotlán" data-tz="America/Mexico_City" data-tzlabel="Tepotzotlán, EDOMEX (CST)">
+        <div class="content">
+            <div class="location-tag" data-i18n="tag_mex">MEXICO</div>
+            <h2>ALMX-TE</h2>
+            <h4 class="subtitle" data-i18n="sub_mfg_assembly">Assembly Plant</h4>
+            <p>Tepotzotlán, Estado de México</p>
+            <p data-i18n="desc_te">Production Plant for Rear Lamps</p>
+            <button class="btn-details" data-i18n="btn_details" onclick="openModal('ALMX-TE')">View Details</button>
+        </div>
+    </section>
+
+    <section id="sec-mtc" class="panel" data-lon="-99.13" data-lat="19.43" data-zoom="5" data-country="MEX" data-label="MTC Mexico" data-tz="America/Mexico_City" data-tzlabel="Ciudad de México (CST)">
+        <div class="content">
+            <div class="location-tag" data-i18n="tag_mex">MEXICO</div>
+            <h2>MTC Mexico</h2>
+            <h4 class="subtitle" data-i18n="sub_tech_center">Technical Center</h4>
+            <p>Ciudad de México</p>
+            <p data-i18n="desc_mtc">Design HUB</p>
+            <button class="btn-details" data-i18n="btn_details" onclick="openModal('MTC')">View Details</button>
+        </div>
+    </section>
+
+    <section id="sec-vision" class="panel vision-panel" data-lon="-95.00" data-lat="38.00" data-zoom="1.2" data-country="USA,MEX" data-label="">
+        <div class="vision-container">
+            <div class="damian-card">
+                <img id="damianCardImg" src="Other/Damian.png" alt="Damián Seweryn">
+                <div class="damian-info">
+                    <h3 data-i18n="card1_title">Damián Seweryn</h3>
+                    <p data-i18n="card1_desc">Head of NAM</p>
+                </div>
+            </div>
+            <div class="ahead-card">
+                <img id="aheadCardLogo" src="Other/AHEAD.png" class="ahead-original-logo" alt="AHEAD">
+                <p>
+                    <strong style="color: var(--marelli-cyan); font-weight: 800; font-size: 1.2rem;">AHEAD 2031</strong> 
+                    <span data-i18n="card2_desc" style="color: #000000; font-weight: 500;">is Marelli's transformation strategy to build a more agile, profitable, and innovative organization, driving sustainable growth through operational excellence, talent development, digitalization, process automation, and customer-focused collaboration.</span>
+                </p>
+            </div>
+            <div class="video-card-16-9" onclick="openVideoModal('Video/Revolution.mp4')">
+                <video autoplay loop muted playsinline>
+                    <source src="Video/Revolution.mp4" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer id="sec-footer" class="site-footer panel" data-lon="-95.00" data-lat="38.00" data-zoom="1.2" data-country="NONE" data-label="">
+    <div class="footer-top">
+        <div class="footer-logo">
+            <a href="https://www.marelli.com/" target="_blank">
+                <img class="marelli-logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjguNTEgMzAwLjUiPgogIDxwYXRoIGQ9Ik0xODQuMjU0IDEwNi4zNzkgMCAwdjIxMi43NTlsNTkuMjM0LTM0LjJ2LTc1Ljk2bDY1Ljc4IDM3Ljk4em0wIDBMMzY4LjUwNCAwdjIxMi43NTlsLTU5LjI0LTM0LjJ2LTc1Ljk2bC02NS43NyAzNy45OHoiIGZpbGw9IiMwMDljZGUiPjwvcGF0aD4KICA8cGF0aCBkPSJNMCAyNDIuNjI5aDE0LjA0OGwxNS41NzIgMjQuNDczIDE1LjU3Mi0yNC40NzNoMTQuMDQydjU3Ljg3Nkg0Ni4yOTJ2LTM3LjI1bC0xNi42NzIgMjQuNzJoLS4zMzlsLTE2LjUtMjQuNDc0djM3SDB6bTkxLjUyNCAwaDExLjk4NGwyNS4zMiA1Ny44NzZoLTEzLjU5MmwtNS4yMjEtMTIuMTE2SDg0LjY2M2wtNS4yMSAxMi4xMTZINjYuMjA0em0xMy44NTIgMzQuNTE2LTguMDMxLTE5LjIyLTguMDM5IDE5LjIyem0zMC41MTgtMzQuNTE2aDI3LjQxNGM3LjYyNSAwIDEzLjUzNyAyLjA2NyAxNy40NzcgNS44NyAzLjM0MSAzLjIyNCA1LjEzOSA4IDUuMTM5IDEzLjQ1NXYuMTY0YzAgOS4zNDUtNS4yMjQgMTUuNDQxLTEyLjg0OSAxOC4xNjlsMTQuNjUgMjAuMjE4aC0xNS40MmwtMTIuODUyLTE4LjA2OWgtMTAuMzY2djE4LjA2OWgtMTMuMTkzem0yNi41NTkgMjguNTYzYzYuNDIzIDAgMTAuMTA4LTMuNTMyIDEwLjEwOC04LjQxM3YtLjE2NGMwLTUuNDU3LTMuOTQtOC41LTEwLjM2Ni04LjVoLTEzLjEwOHYxNy4wNzN6bTM1LjAyMS0yOC41NjNoNDQuNTU5djExLjMyNmgtMzEuNjQ2djExLjc0aDI3Ljg1M3YxMS4zM2gtMjcuODUzdjEyLjE1OGgzMi4wNzF2MTEuMzI2aC00NC45ODR6bTU2LjQzIDBoMTN2NDYuM2gyOS4wMDZ2MTEuNTc2aC00Mi4wMDZ6bTUxLjIzIDBoMTN2NDYuM2gyOS4wMXYxMS41NzZoLTQyLjAxem01MC4zNyAwaDEzdjU3Ljg3NmgtMTN6IiBmaWxsPSIjMDAyODU1Ij48L3BhdGg+Cjwvc3ZnPgo=" alt="Marelli">
+            </a>
+            <div class="logo-separator footer-sep" style="display:block;"></div>
+            <a href="#sec-vision" onclick="instantNavigate(event, 'sec-vision')" title="Go to Sustainability" class="ahead-logo-link" style="display:block;">
+                <img id="footerAheadLogo" src="Other/AHEAD.png" class="ahead-logo-img" alt="AHEAD">
+            </a>
+        </div>
+    </div>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4 data-i18n="foot_data">Dashboard Data</h4>
+            <p data-i18n="foot_update">Last Updated: October 28, 2026</p>
+            <p>Version 1.0.0</p>
+        </div>
+        <div class="footer-col">
+            <h4 data-i18n="foot_links">Corporate Links</h4>
+            <a href="https://www.marelli.com" target="_blank">Marelli Global</a>
+            <a href="https://www.marelli.com/innovation/" target="_blank">Innovation</a>
+            <a href="https://www.marelli.com/sustainability/" target="_blank">Sustainability</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 Marelli Holdings Co., Ltd. All rights reserved.</p>
+        <p class="footer-signature-bottom" data-i18n="foot_dev">Developed & Engineered by Luis González</p>
+    </div>
+</footer>
+
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="instantNavigate(event, 'sec-hero')">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+// ==========================================
+// NAVEGACIÓN Y CIERRE DE MODAL
+// ==========================================
+let snapTimeout;
+
+function instantNavigate(event, targetId) {
+    if(event) event.preventDefault();
+    
+    clearTimeout(snapTimeout);
+    document.documentElement.style.scrollBehavior = 'auto';
+    document.documentElement.style.scrollSnapType = 'none';
+
+    if(document.getElementById('details-view')) document.getElementById('details-view').style.display = 'none';
+    if(typeof slideInterval !== 'undefined') clearInterval(slideInterval);
+    if(document.getElementById("modalVideoContainer")) document.getElementById("modalVideoContainer").innerHTML = "";
+    if(typeof tourState !== 'undefined' && tourState !== 'IDLE' && event !== null) stopTour(); 
+    
+    const mainView = document.getElementById('main-view');
+    if(mainView) mainView.style.display = 'block';
+    if(document.getElementById('globe-container')) document.getElementById('globe-container').style.display = 'block';
+    if(document.getElementById('local-time-display')) document.getElementById('local-time-display').style.display = 'flex';
+    
+    activePlantId = null;
+
+    if(mainView) void mainView.offsetHeight;
+
+    const target = document.getElementById(targetId);
+    if(target) { 
+        window.scrollTo(0, target.offsetTop); 
+    }
+    
+    snapTimeout = setTimeout(() => { 
+        if(target) window.scrollTo(0, target.offsetTop); 
+        document.documentElement.style.scrollBehavior = 'smooth'; 
+        document.documentElement.style.scrollSnapType = 'y mandatory'; 
+    }, 120);
+}
+
+// ==========================================
+// MOTOR SECUENCIAL DE REPRODUCCIÓN DE VIDEOS
+// ==========================================
+function setupSequentialPlayer(containerId, videoArray) {
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    
+    container.innerHTML = ""; 
+    
+    if(!videoArray || videoArray.length === 0) {
+        container.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; width:100%; height:100%; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:2px; font-size:0.85rem;">Coming Soon</div>`;
+        return;
+    }
+    
+    const videoEl = document.createElement('video');
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+    videoEl.autoplay = true; 
+    
+    // Removimos el atributo poster. El video cargará sin imagen previa corporativa.
+    
+    videoEl.style.width = "100%";
+    videoEl.style.height = "100%";
+    videoEl.style.objectFit = "cover";
+    videoEl.style.pointerEvents = "none";
+    
+    let currentIndex = 0;
+    videoEl.src = videoArray[currentIndex];
+    
+    videoEl.addEventListener('ended', () => {
+        currentIndex = (currentIndex + 1) % videoArray.length;
+        videoEl.src = videoArray[currentIndex];
+        videoEl.play().catch(e => console.warn(e));
+    });
+    
+    container.appendChild(videoEl);
+}
+
+// ==========================================
+// LÓGICA DE VIDEO A PANTALLA COMPLETA
+// ==========================================
+const videoModal = document.getElementById('fullscreen-video-modal');
+const videoPlayer = document.getElementById('fullscreen-video-player');
+
+function openVideoModal(videoSrc) {
+    if(videoPlayer && videoModal) {
+        videoPlayer.src = videoSrc;
+        videoModal.classList.add('active');
+        videoPlayer.play();
+    }
+}
+
+function closeVideoModal(event) {
+    if (event && event.target !== videoModal && !event.target.classList.contains('close-video-btn')) return;
+    if(videoModal && videoPlayer) {
+        videoModal.classList.remove('active');
+        videoPlayer.pause();
+        videoPlayer.src = "";
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape" && videoModal && videoModal.classList.contains('active')) {
+        closeVideoModal();
+    }
+});
+
+// ==========================================
+// DICCIONARIO DE TRADUCCIONES 
+// ==========================================
+const i18n = {
+    "EN": { 
+        "nav_nafta": "NAFTA", "nav_footprint": "Footprint", "nav_plants": "Plants", "nav_offices": "Headquarters", "nav_tech": "Tech Centers", "nav_countries": "Countries", "nav_ahead": "AHEAD", "search_placeholder": "Search...", 
+        "hero_title": "Welcome to<br>Marelli Lighting<br><span>North America</span>", "hero_desc": "Marelli Manufacturing Footprint Across United States and Mexico.", 
+        "foot_title": "Manufacturing Footprint", "kpi_assembly": "Assembly Plants", "kpi_office": "Headquarters", "kpi_tech": "Tech Center", "kpi_emp": "Employees", "kpi_countries": "Countries", 
+        "tag_usa": "UNITED STATES", "tag_mex": "MEXICO", "tag_eng": "ENGINEERING", "tag_hq": "HEADQUARTERS", 
+        "sub_mfg_assembly": "Assembly Plant", "sub_corp_office": "Headquarters", "sub_tech_center": "Technical Center", "btn_details": "View Details", "btn_back": "&#8592; Back to Map", 
+        "desc_pu": "Production Plant for Head & Rear Lamps", "desc_ju1": "Production Plant for Head & Rear Lamps and Modules", "desc_ju2": "Production Plant for Head & Rear Lamps", "desc_to": "Production Plant for Head & Rear Lamps", "desc_te": "Production Plant for Rear Lamps", "desc_mtc": "Design HUB", "desc_sf": "Regional Headquarters", 
+        "countries_title": "United States & Mexico", "countries_desc": "Strategic locations powering the North American automotive sector with cutting-edge technology and unparalleled logistics.", 
+        "btn_start_tour": "Start Tour", "btn_pause_tour": "Pause Tour", "btn_resume_tour": "Resume Tour", "btn_stop_tour": "Stop Tour",
+        "card1_title": "Damián Seweryn", "card1_desc": "Head of NAM", 
+        "card2_desc": "is Marelli's transformation strategy to build a more agile, profitable, and innovative organization, driving sustainable growth through operational excellence, talent development, digitalization, process automation, and customer-focused collaboration.", 
+        "mod_cap": "Manufacturing Capabilities", "mod_staff": "Staff & Headcount", "mod_surface": "Surface Area", "mod_cust": "Main Customers", "foot_dev": "Developed & Engineered by <a href='mailto:Luis.gonzalez@marelli.com' title='Luis.gonzalez@marelli.com' class='dev-link'>Luis González</a>", "foot_data": "Dashboard Data", "foot_update": "Last Updated: October 28, 2026", "foot_links": "Corporate Links" 
+    },
+    "ES": { 
+        "nav_nafta": "NAFTA", "nav_footprint": "Huella", "nav_plants": "Plantas", "nav_offices": "Sede Central", "nav_tech": "Tech Centers", "nav_countries": "Países", "nav_ahead": "AHEAD", "search_placeholder": "Buscar...", 
+        "hero_title": "Bienvenido a<br>Marelli Lighting<br><span>Norteamérica</span>", "hero_desc": "Huella de Manufactura de Marelli en Estados Unidos y México.", 
+        "foot_title": "Huella de Manufactura", "kpi_assembly": "Plantas de Ensamblaje", "kpi_office": "Sede Central", "kpi_tech": "Centro Tecnológico", "kpi_emp": "Empleados", "kpi_countries": "Países", 
+        "tag_usa": "ESTADOS UNIDOS", "tag_mex": "MÉXICO", "tag_eng": "INGENIERÍA", "tag_hq": "SEDE CENTRAL", 
+        "sub_mfg_assembly": "Planta de Ensamblaje", "sub_corp_office": "Sede Central", "sub_tech_center": "Centro Técnico", "btn_details": "Ver Detalles", "btn_back": "&#8592; Volver al Mapa", 
+        "desc_pu": "Planta de Producción de Faros y Luces Traseras", "desc_ju1": "Planta de Producción de Faros, Luces Traseras y Módulos", "desc_ju2": "Planta de Producción de Faros y Luces Traseras", "desc_to": "Planta de Producción de Faros y Luces Traseras", "desc_te": "Planta de Producción de Luces Traseras", "desc_mtc": "Centro de Diseño (Design HUB)", "desc_sf": "Sede Regional", 
+        "countries_title": "Estados Unidos y México", "countries_desc": "Ubicaciones estratégicas que impulsan el sector automotriz en Norteamérica con tecnología de punta y logística inigualable.", 
+        "btn_start_tour": "Iniciar Tour", "btn_pause_tour": "Pausar Tour", "btn_resume_tour": "Reanudar Tour", "btn_stop_tour": "Detener Tour",
+        "card1_title": "Damián Seweryn", "card1_desc": "Head of NAM", 
+        "card2_desc": "es la estrategia de transformación de Marelli para construir una organización más ágil, rentable e innovadora, impulsando el crecimiento sostenible a través de la excelencia operativa, el desarrollo del talento, la digitalización, la automatización de procesos y una colaboración enfocada en el cliente.", 
+        "mod_cap": "Capacidades de Manufactura", "mod_staff": "Personal y Plantilla", "mod_surface": "Superficie de Planta", "mod_cust": "Clientes Principales", "foot_dev": "Desarrollado y Diseñado por <a href='mailto:Luis.gonzalez@marelli.com' title='Luis.gonzalez@marelli.com' class='dev-link'>Luis González</a>", "foot_data": "Datos del Dashboard", "foot_update": "Última Actualización: 28 de Octubre de 2026", "foot_links": "Enlaces Corporativos" 
+    },
+    "IT": { 
+        "nav_nafta": "NAFTA", "nav_footprint": "Presenza", "nav_plants": "Stabilimenti", "nav_offices": "Sede Centrale", "nav_tech": "Centri Tecnologici", "nav_countries": "Paesi", "nav_ahead": "AHEAD", "search_placeholder": "Cerca...", 
+        "hero_title": "Benvenuti in<br>Marelli Lighting<br><span>Nord America</span>", "hero_desc": "Presenza Produttiva Marelli in Stati Uniti e Messico.", 
+        "foot_title": "Presenza Produttiva", "kpi_assembly": "Stabilimenti di Assemblaggio", "kpi_office": "Sede Centrale", "kpi_tech": "Centro Tecnologico", "kpi_emp": "Dipendenti", "kpi_countries": "Paesi", 
+        "tag_usa": "STATI UNITI", "tag_mex": "MESSICO", "tag_eng": "INGEGNERIA", "tag_hq": "SEDE CENTRALE", 
+        "sub_mfg_assembly": "Stabilimento di Assemblaggio", "sub_corp_office": "Sede Centrale", "sub_tech_center": "Centro Tecnico", "btn_details": "Vedi Dettagli", "btn_back": "&#8592; Torna alla Mappa", 
+        "desc_pu": "Impianto di Produzione per Fari e Fanali Posteriori", "desc_ju1": "Impianto di Produzione per Fari, Fanali Posteriori e Moduli", "desc_ju2": "Impianto di Produzione per Fari e Fanali Posteriori", "desc_to": "Impianto di Produzione per Fari e Fanali Posteriori", "desc_te": "Impianto di Produzione per Fanali Posteriori", "desc_mtc": "Design HUB", "desc_sf": "Sede Regionale", 
+        "countries_title": "Stati Uniti e Messico", "countries_desc": "Posizioni strategiche che alimentano il settore automobilistico con tecnologia all'avanguardia.", 
+        "btn_start_tour": "Inizia Tour", "btn_pause_tour": "Pausa Tour", "btn_resume_tour": "Riprendi Tour", "btn_stop_tour": "Ferma Tour",
+        "card1_title": "Damián Seweryn", "card1_desc": "Head of NAM", 
+        "card2_desc": "è la strategia di trasformazione di Marelli per costruire un'organizzazione più agile, redditizia e innovativa, guidando la crescita sostenibile attraverso l'eccellenza operativa, lo sviluppo dei talenti, la digitalizzazione, l'automazione dei processi e una collaborazione focalizzata sul cliente.", 
+        "mod_cap": "Capacità Produttive", "mod_staff": "Personale e Organico", "mod_surface": "Area di Superficie", "mod_cust": "Clienti Principali", "foot_dev": "Sviluppato e Progettato da <a href='mailto:Luis.gonzalez@marelli.com' title='Luis.gonzalez@marelli.com' class='dev-link'>Luis González</a>", "foot_data": "Dati del Dashboard", "foot_update": "Ultimo Aggiornamento: 28 Ottobre 2026", "foot_links": "Link Aziendali" 
+    },
+    "CN": { 
+        "nav_nafta": "NAFTA", "nav_footprint": "业务版图", "nav_plants": "工厂", "nav_offices": "总部", "nav_tech": "技术中心", "nav_countries": "国家", "nav_ahead": "AHEAD", "search_placeholder": "搜索...", 
+        "hero_title": "欢迎来到<br>马瑞利照明<br><span>北美</span>", "hero_desc": "马瑞利在美国和墨西哥的制造版图。", 
+        "foot_title": "制造版图", "kpi_assembly": "组装工厂", "kpi_office": "总部", "kpi_tech": "技术中心", "kpi_emp": "员工", "kpi_countries": "国家", 
+        "tag_usa": "美国", "tag_mex": "墨西哥", "tag_eng": "工程技术", "tag_hq": "总部", 
+        "sub_mfg_assembly": "组装工厂", "sub_corp_office": "总部", "sub_tech_center": "技术中心", "btn_details": "查看详情", "btn_back": "&#8592; 返回地图", 
+        "desc_pu": "前照灯和尾灯生产厂", "desc_ju1": "前照灯、尾灯和模块生产厂", "desc_ju2": "前照灯和尾灯生产厂", "desc_to": "前照灯和尾灯生产厂", "desc_te": "尾灯生产厂", "desc_mtc": "设计中心 (Design HUB)", "desc_sf": "地区总部", 
+        "countries_title": "美国与墨西哥", "countries_desc": "以尖端技术和无与伦比的物流能力推动北美汽车行业发展的战略要地。", 
+        "btn_start_tour": "开始导览", "btn_pause_tour": "暂停导览", "btn_resume_tour": "继续导览", "btn_stop_tour": "停止导览",
+        "card1_title": "Damián Seweryn", "card1_desc": "Head of NAM", 
+        "card2_desc": "是马瑞利的转型战略，旨在建立一个更敏捷、更盈利、更创新的组织，通过卓越运营、人才发展、数字化、流程自动化和以客户为中心的合作推动可持续增长。", 
+        "mod_cap": "制造能力", "mod_staff": "员工人数", "mod_surface": "厂区面积", "mod_cust": "主要客户", "foot_dev": "由 <a href='mailto:Luis.gonzalez@marelli.com' title='Luis.gonzalez@marelli.com' class='dev-link'>Luis González</a> 开发和设计", "foot_data": "仪表板数据", "foot_update": "最后更新: 2026年10月28日", "foot_links": "企业链接" 
+    },
+    "PL": { 
+        "nav_nafta": "NAFTA", "nav_footprint": "Zakłady", "nav_plants": "Fabryki", "nav_offices": "Siedziby", "nav_tech": "Centra Technologiczne", "nav_countries": "Kraje", "nav_ahead": "AHEAD", "search_placeholder": "Szukaj...", 
+        "hero_title": "Witamy w<br>Marelli Lighting<br><span>Ameryka Północna</span>", "hero_desc": "Zasięg Produkcyjny Marelli w Stanach Zjednoczonych i Meksyku.", 
+        "foot_title": "Zasięg Produkcyjny", "kpi_assembly": "Zakłady Montażowe", "kpi_office": "Siedziba Główna", "kpi_tech": "Centrum Technologiczne", "kpi_emp": "Pracownicy", "kpi_countries": "Kraje", 
+        "tag_usa": "STANY ZJEDNOCZONE", "tag_mex": "MEKSYK", "tag_eng": "INŻYNIERIA", "tag_hq": "SIEDZIBA GŁÓWNA", 
+        "sub_mfg_assembly": "Zakład Montażowy", "sub_corp_office": "Siedziba Główna", "sub_tech_center": "Centrum Technologiczne", "btn_details": "Zobacz Szczegóły", "btn_back": "&#8592; Wróć do Mapy", 
+        "desc_pu": "Zakład produkcyjny reflektorów i lamp tylnych", "desc_ju1": "Zakład produkcyjny reflektorów, lamp tylnych i modułów", "desc_ju2": "Zakład produkcyjny reflektorów i lamp tylnych", "desc_to": "Zakład produkcyjny reflektorów i lamp tylnych", "desc_te": "Zakład produkcyjny lamp tylnych", "desc_mtc": "Centrum Projektowe (Design HUB)", "desc_sf": "Siedziba Regionalna", 
+        "countries_title": "Stany Zjednoczone i Meksyk", "countries_desc": "Strategiczne lokalizacje napędzające sektor motoryzacyjny w Ameryce Północnej dzięki najnowocześniejszej technologii i niezrównanej logistyce.", 
+        "btn_start_tour": "Rozpocznij Wycieczkę", "btn_pause_tour": "Pauza", "btn_resume_tour": "Wznów Wycieczkę", "btn_stop_tour": "Zatrzymaj Wycieczkę",
+        "card1_title": "Damián Seweryn", "card1_desc": "Head of NAM", 
+        "card2_desc": "to strategia transformacji Marelli mająca na celu stworzenie bardziej zwinnej, zyskownej i innowacyjnej organizacji, napędzającej zrównoważony wzrost poprzez doskonałość operacyjną, rozwój talentów, cyfryzację, automatyzację procesów i współpracę zorientowaną na klienta.", 
+        "mod_cap": "Możliwości Produkcyjne", "mod_staff": "Personel i Zatrudnienie", "mod_surface": "Powierzchnia", "mod_cust": "Główni Klienci", "foot_dev": "Opracowano i zaprojektowano przez <a href='mailto:Luis.gonzalez@marelli.com' title='Luis.gonzalez@marelli.com' class='dev-link'>Luis González</a>", "foot_data": "Dane Dashboardu", "foot_update": "Ostatnia Aktualizacja: 28 Października 2026", "foot_links": "Linki Korporacyjne" 
+    }
+};
+
+// ==========================================
+// BASE DE DATOS DE LOGOS DE CLIENTES
+// ==========================================
+const customerLogos = {
+    "Ram": "Logo/Ram.png",
+    "Infiniti": "Logo/Infiniti.png",
+    "Nissan": "Logo/Nissan.png",
+    "Jeep": "Logo/Jeep.jpg",
+    "Stellantis": "Logo/Stellantis.png",
+    "Volvo": "Logo/Volvo.png",
+    "Mercedes": "Logo/Mercedes.png",
+    "Ford": "Logo/Ford.png",
+    "Tesla": "Logo/Tesla.png",
+    "Chrysler": "Logo/Chrysler.jpg",
+    "Rivian": "Logo/Rivian.png",
+    "BMW": "Logo/BMW.webp",
+    "GM": "Logo/GM.png",
+    "GMC": "Logo/GMC.png",
+    "Volkswagen": "Logo/VW.png",
+    "Audi": "Logo/Audi.png"
+};
+
+const fallbackSVG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNDAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMmMyYzJjIi8+PC9zdmc+";
+
+// ==========================================
+// BASE DE DATOS DE PLANTAS (CON NARRACIÓN Y VIDEOS SECUENCIALES)
+// ==========================================
+const plantData = {
+    "ALUS-PU": { 
+        sectionId: "sec-pulaski", tz: "America/Chicago", title: "ALUS-PU (Pulaski)", location: "Pulaski, Tennessee, USA", 
+        images: ["Plant/PU1.png", "Plant/PU2.jpg", "Plant/PU3.png", "Plant/PU4.png"], 
+        videoUrls: ["Video/PU.mp4", "Video/PU1.mp4"], // LOOP ACTUALIZADO CON PU1
+        processVideos: {
+            molding: [], 
+            coating: [], 
+            assembly: []
+        },
+        customers: ["Ram", "Infiniti", "Nissan", "Jeep", "Stellantis"],
+        capabilities: { 
+            "EN": ["30 Injection TMP", "5 Lacquering (x2 HC, x3 AF)", "5 Metalizing", "Headlamps (3.2m)", "Rear lamps (0.6m)"], 
+            "ES": ["30 Máquinas de Inyección TMP", "5 Líneas de Lacado (x2 HC, x3 AF)", "5 Metalizadoras", "Faros (3.2m)", "Luces Traseras (0.6m)"], 
+            "IT": ["30 Macchine a Iniezione TMP", "5 Linee di Laccatura (x2 HC, x3 AF)", "5 Metallizzatrici", "Fari (3.2m)", "Fanali Posteriori (0.6m)"], 
+            "CN": ["30台 TMP 注塑机", "5条涂装线 (x2 HC, x3 AF)", "5台金属化设备", "前照灯 (3.2m)", "尾灯 (0.6m)"],
+            "PL": ["30 Wtryskarek TMP", "5 Linii Lakierniczych (x2 HC, x3 AF)", "5 Metalizatorów", "Reflektory (3.2m)", "Lampy tylne (0.6m)"]
+        },
+        staff: { 
+            "EN": ["Total Headcount: 461", "Direct BC: 332", "Indirect BC: 52", "WC: 77"], 
+            "ES": ["Plantilla Total: 461", "Directos BC: 332", "Indirectos BC: 52", "WC: 77"], 
+            "IT": ["Organico Totale: 461", "Diretti BC: 332", "Indiretti BC: 52", "WC: 77"], 
+            "CN": ["员工总数：461", "直接员工：332", "间接员工：52", "WC：77"],
+            "PL": ["Całkowite Zatrudnienie: 461", "Bezpośredni BC: 332", "Pośredni BC: 52", "WC: 77"]
+        },
+        surface: { 
+            "EN": ["Total Area: 172,173 sqm", "Covered Area: 36,444 sqm", "Logistics Area: 43%"], 
+            "ES": ["Área Total: 172,173 m²", "Área Cubierta: 36,444 m²", "Área Logística: 43%"], 
+            "IT": ["Area Totale: 172.173 m²", "Area Coperta: 36.444 m²", "Area Logistica: 43%"], 
+            "CN": ["总面积：172,173 平方米", "建筑面积：36,444 平方米", "物流区域：43%"],
+            "PL": ["Powierzchnia Całkowita: 172,173 m²", "Powierzchnia Zabudowana: 36,444 m²", "Obszar Logistyczny: 43%"]
+        },
+        narration: {
+            "ES": "La mayor planta de Headlamps de Marelli en Norteamérica, combinando manufactura avanzada, automatización y una infraestructura de 172.1 mil metros cuadrados para producir hasta 3.2 millones de unidades al año.",
+            "EN": "Marelli's largest headlamp plant in North America, combining advanced manufacturing, automation, and a 172.1 thousand square meter infrastructure to produce up to 3.2 million units a year.",
+            "IT": "Il più grande stabilimento di fari di Marelli in Nord America, che combina produzione avanzata, automazione e un'infrastruttura di 172,1 mila metri quadrati per produrre fino a 3,2 milioni di unità all'anno.",
+            "CN": "马瑞利在北美最大的前照灯工厂，结合先进制造、自动化和17.21万平方米的基础设施，年产量高达320万套。",
+            "PL": "Największa fabryka reflektorów Marelli w Ameryce Północnej, łącząca zaawansowaną produkcję, automatyzację i infrastrukturę o powierzchni 172,1 tysiąca metrów kwadratowych, aby produkować do 3,2 miliona sztuk rocznie."
+        }
+    },
+    "ALMX-JU1": { 
+        sectionId: "sec-juarez1", tz: "America/Ciudad_Juarez", title: "ALMX-JU1 (Juárez I)", location: "Ciudad Juárez, Chihuahua, Mexico", 
+        images: ["Plant/1JU1.png", "Plant/1JU2.png", "Plant/1JU3.png", "Plant/1JU4.jpg"], 
+        videoUrls: ["Video/JU1.mp4"],
+        processVideos: { molding: [], coating: [], assembly: [] },
+        customers: ["Volvo", "Mercedes", "Stellantis", "Ford", "Tesla", "Chrysler"], // RIVIAN REMOVIDO
+        capabilities: { 
+            "EN": ["43 Injection TMP", "4 Lacquering (x1 HC Flow, x2 HC Spray, x1 AF)", "11 Metalizing", "Headlamps (0.5m)", "Rear lamps (3.8m)", "Modules (8.8m)"], 
+            "ES": ["43 Máquinas de Inyección TMP", "4 Líneas de Lacado (x1 HC Flow, x2 HC Spray, x1 AF)", "11 Metalizadoras", "Faros (0.5m)", "Luces Traseras (3.8m)", "Módulos (8.8m)"], 
+            "IT": ["43 Macchine a Iniezione TMP", "4 Linee di Laccatura (x1 HC Flow, x2 HC Spray, x1 AF)", "11 Metallizzatrici", "Fari (0.5m)", "Fanali Posteriori (3.8m)", "Moduli (8.8m)"], 
+            "CN": ["43台 TMP 注塑机", "4条涂装线 (x1 HC Flow, x2 HC Spray, x1 AF)", "11台金属化设备", "前照灯 (0.5m)", "尾灯 (3.8m)", "模块 (8.8m)"],
+            "PL": ["43 Wtryskarki TMP", "4 Linie Lakiernicze (x1 HC Flow, x2 HC Spray, x1 AF)", "11 Metalizatorów", "Reflektory (0.5m)", "Lampy tylne (3.8m)", "Moduły (8.8m)"]
+        },
+        staff: { 
+            "EN": ["Total Headcount: 1,038", "Direct BC: 792", "Indirect BC: 132", "WC: 114"], 
+            "ES": ["Plantilla Total: 1,038", "Directos BC: 792", "Indirectos BC: 132", "WC: 114"], 
+            "IT": ["Organico Totale: 1.038", "Diretti BC: 792", "Indiretti BC: 132", "WC: 114"], 
+            "CN": ["员工总数：1,038", "直接员工：792", "间接员工：132", "WC：114"],
+            "PL": ["Całkowite Zatrudnienie: 1,038", "Bezpośredni BC: 792", "Pośredni BC: 132", "WC: 114"]
+        },
+        surface: { 
+            "EN": ["Total Area: 87,333 sqm", "Covered Area: 39,461 sqm", "Logistics Area: 37%"], 
+            "ES": ["Área Total: 87,333 m²", "Área Cubierta: 39,461 m²", "Área Logística: 37%"], 
+            "IT": ["Area Totale: 87.333 m²", "Area Coperta: 39.461 m²", "Area Logistica: 37%"], 
+            "CN": ["总面积：87,333 平方米", "建筑面积：39,461 平方米", "物流区域：37%"],
+            "PL": ["Powierzchnia Całkowita: 87,333 m²", "Powierzchnia Zabudowana: 39,461 m²", "Obszar Logistyczny: 37%"]
+        },
+        narration: {
+            "ES": "Instalación estratégica de manufactura con capacidades de ensamble, inyección, metalizado y recubrimiento, produciendo Headlamps, Rear Lamps y módulos LED para Norteamérica.",
+            "EN": "Strategic manufacturing facility with assembly, injection, metalizing, and coating capabilities, producing Headlamps, Rear Lamps, and LED modules for North America.",
+            "IT": "Struttura manifatturiera strategica con capacità di assemblaggio, iniezione, metallizzazione e rivestimento, che produce fari, fanali posteriori e moduli LED per il Nord America.",
+            "CN": "战略制造设施，具备组装、注塑、金属化和涂层能力，为北美生产前照灯、尾灯和LED模块。",
+            "PL": "Strategiczny zakład produkcyjny z możliwościami montażu, wtrysku, metalizacji i powlekania, produkujący reflektory, lampy tylne i moduły LED na Amerykę Północną."
+        }
+    },
+    "ALMX-JU2": { 
+        sectionId: "sec-juarez2", tz: "America/Ciudad_Juarez", title: "ALMX-JU2 (Juárez II)", location: "Ciudad Juárez, Chihuahua, Mexico", 
+        images: ["Plant/2JU1.png", "Plant/2JU2.jpg"], 
+        videoUrls: ["Video/JU2.mp4"],
+        processVideos: { molding: [], coating: [], assembly: [] },
+        customers: ["BMW", "Tesla", "GM", "GMC", "Stellantis", "Rivian"], // RIVIAN AGREGADO AQUÍ
+        capabilities: { 
+            "EN": ["9 Injection BMC / 61 Injection TMP / 9 Thick Lens", "8 Lacquering (x2 HC, x4 AF, x2 BC)", "23 Metalizing", "Headlamps (2.7m)", "Rear lamps (3.1m)"], 
+            "ES": ["9 Inyección BMC / 61 Inyección TMP / 9 Lentes Gruesos", "8 Líneas de Lacado (x2 HC, x4 AF, x2 BC)", "23 Metalizadoras", "Faros (2.7m)", "Luces Traseras (3.1m)"], 
+            "IT": ["9 Iniezione BMC / 61 Iniezione TMP / 9 Lenti Spesse", "8 Linee di Laccatura (x2 HC, x4 AF, x2 BC)", "23 Metallizzatrici", "Fari (2.7m)", "Fanali Posteriori (3.1m)"], 
+            "CN": ["9台 BMC 注塑机 / 61台 TMP 注塑机 / 9台厚透镜注塑机", "8条涂装线 (x2 HC, x4 AF, x2 BC)", "23台金属化设备", "前照灯 (2.7m)", "尾灯 (3.1m)"],
+            "PL": ["9 Wtryskarek BMC / 61 Wtryskarek TMP / 9 Grubych Soczewek", "8 Linii Lakierniczych (x2 HC, x4 AF, x2 BC)", "23 Metalizatory", "Reflektory (2.7m)", "Lampy tylne (3.1m)"]
+        },
+        staff: { 
+            "EN": ["Total Headcount: 1,007", "Direct BC: 704", "Indirect BC: 160", "WC: 143"], 
+            "ES": ["Plantilla Total: 1,007", "Directos BC: 704", "Indirectos BC: 160", "WC: 143"], 
+            "IT": ["Organico Totale: 1.007", "Diretti BC: 704", "Indiretti BC: 160", "WC: 143"], 
+            "CN": ["员工总数：1,007", "直接员工：704", "间接员工：160", "WC：143"],
+            "PL": ["Całkowite Zatrudnienie: 1,007", "Bezpośredni BC: 704", "Pośredni BC: 160", "WC: 143"]
+        },
+        surface: { 
+            "EN": ["Total Area: 101,585 sqm", "Occupied Area: 49,285 sqm", "Logistics Area: 63%"], 
+            "ES": ["Área Total: 101,585 m²", "Área Ocupada: 49,285 m²", "Área Logística: 63%"], 
+            "IT": ["Area Totale: 101.585 m²", "Area Occupata: 49.285 m²", "Area Logistica: 63%"], 
+            "CN": ["总面积：101,585 平方米", "占用面积：49,285 平方米", "物流区域：63%"],
+            "PL": ["Powierzchnia Całkowita: 101,585 m²", "Powierzchnia Zajęta: 49,285 m²", "Obszar Logistyczny: 63%"]
+        },
+        narration: {
+            "ES": "Centro de manufactura de alta tecnología especializado en Headlamps y Rear Lamps, con amplias capacidades de inyección, metalizado y ensamble para programas de gran volumen.",
+            "EN": "High-tech manufacturing center specialized in Headlamps and Rear Lamps, with extensive injection, metalizing, and assembly capabilities for high-volume programs.",
+            "IT": "Centro di produzione ad alta tecnologia specializzato in fari e fanali posteriori, con ampie capacità di iniezione, metallizzazione e assemblaggio per programmi ad alto volume.",
+            "CN": "专门生产前照灯和尾灯的高科技制造中心，具有针对大批量项目的广泛注塑、金属化和组装能力。",
+            "PL": "Zaawansowane technologicznie centrum produkcyjne specjalizujące się w reflektorach i lampach tylnych, z rozbudowanymi możliwościami wtrysku, metalizacji i montażu dla programów wielkoseryjnych."
+        }
+    },
+    "ALMX-TO": { 
+        sectionId: "sec-toluca", tz: "America/Mexico_City", title: "ALMX-TO (Toluca)", location: "Toluca, Estado de México", 
+        images: ["Plant/TO.jpg", "Plant/TO1.png", "Plant/TO2.jpg"], 
+        videoUrls: ["Video/TO.mp4"],
+        processVideos: { molding: [], coating: [], assembly: [] },
+        customers: ["Volkswagen", "Audi", "Tesla", "Stellantis"],
+        capabilities: { 
+            "EN": ["30 Injection TMP", "4 Lacquering (x1 HC, x1 AF, x2 SC)", "11 Metalizing", "Headlamps (1.6m)", "Rear lamps (2.8m)"], 
+            "ES": ["30 Máquinas de Inyección TMP", "4 Líneas de Lacado (x1 HC, x1 AF, x2 SC)", "11 Metalizadoras", "Faros (1.6m)", "Luces Traseras (2.8m)"], 
+            "IT": ["30 Macchine a Iniezione TMP", "4 Linee di Laccatura (x1 HC, x1 AF, x2 SC)", "11 Metallizzatrici", "Fari (1.6m)", "Fanali Posteriori (2.8m)"], 
+            "CN": ["30台 TMP 注塑机", "4条涂装线 (x1 HC, x1 AF, x2 SC)", "11台金属化设备", "前照灯 (1.6m)", "尾灯 (2.8m)"],
+            "PL": ["30 Wtryskarek TMP", "4 Linie Lakiernicze (x1 HC, x1 AF, x2 SC)", "11 Metalizatorów", "Reflektory (1.6m)", "Lampy tylne (2.8m)"]
+        },
+        staff: { 
+            "EN": ["Total Headcount: 1,165", "Direct BC: 857", "Indirect BC: 198", "WC: 110"], 
+            "ES": ["Plantilla Total: 1,165", "Directos BC: 857", "Indirectos BC: 198", "WC: 110"], 
+            "IT": ["Organico Totale: 1.165", "Diretti BC: 857", "Indiretti BC: 198", "WC: 110"], 
+            "CN": ["员工总数：1,165", "直接员工：857", "间接员工：198", "WC：110"],
+            "PL": ["Całkowite Zatrudnienie: 1,165", "Bezpośredni BC: 857", "Pośredni BC: 198", "WC: 110"]
+        },
+        surface: { 
+            "EN": ["Total Area: 32,500 sqm", "Occupied Area: 25,225 sqm", "Logistics Area: 33%"], 
+            "ES": ["Área Total: 32,500 m²", "Área Ocupada: 25,225 m²", "Área Logística: 33%"], 
+            "IT": ["Area Totale: 32.500 m²", "Area Occupata: 25.225 m²", "Area Logistica: 33%"], 
+            "CN": ["总面积：32,500 平方米", "占用面积：25,225 平方米", "物流区域：33%"],
+            "PL": ["Powierzchnia Całkowita: 32,500 m²", "Powierzchnia Zajęta: 25,225 m²", "Obszar Logistyczny: 33%"]
+        },
+        narration: {
+            "ES": "Planta especializada en sistemas de iluminación y módulos LED, respaldada por procesos avanzados de inyección, recubrimiento y metalizado para una producción eficiente y flexible.",
+            "EN": "Plant specialized in lighting systems and LED modules, backed by advanced injection, coating, and metalizing processes for efficient and flexible production.",
+            "IT": "Stabilimento specializzato in sistemi di illuminazione e moduli LED, supportato da processi avanzati di iniezione, rivestimento e metallizzazione per una produzione efficiente e flessibile.",
+            "CN": "专注于照明系统和LED模块的工厂，以先进的注塑、涂层和金属化工艺为支撑，实现高效灵活的生产。",
+            "PL": "Fabryka specjalizująca się w systemach oświetleniowych i modułach LED, wspierana przez zaawansowane procesy wtrysku, powlekania i metalizacji dla wydajnej i elastycznej produkcji."
+        }
+    },
+    "ALMX-TE": { 
+        sectionId: "sec-tepotzotlan", tz: "America/Mexico_City", title: "ALMX-TE (Tepotzotlán)", location: "Tepotzotlán, Estado de México", 
+        images: ["Plant/TE.jpg", "Plant/TE2.png"], 
+        videoUrls: ["Video/TE.mp4"],
+        processVideos: { molding: [], coating: [], assembly: [] },
+        customers: ["Volkswagen", "BMW"],
+        capabilities: { 
+            "EN": ["9 Injection TMP", "3 Metalizing", "Rear lamps (0.7m)"], 
+            "ES": ["9 Máquinas de Inyección TMP", "3 Metalizadoras", "Luces Traseras (0.7m)"], 
+            "IT": ["9 Macchine a Iniezione TMP", "3 Metallizzatrici", "Fanali Posteriori (0.7m)"], 
+            "CN": ["9台 TMP 注塑机", "3台金属化设备", "尾灯 (0.7m)"],
+            "PL": ["9 Wtryskarek TMP", "3 Metalizatory", "Lampy tylne (0.7m)"]
+        },
+        staff: { 
+            "EN": ["Total Headcount: 162", "Direct BC: 113", "Indirect BC: 23", "WC: 26"], 
+            "ES": ["Plantilla Total: 162", "Directos BC: 113", "Indirectos BC: 23", "WC: 26"], 
+            "IT": ["Organico Totale: 162", "Diretti BC: 113", "Indiretti BC: 23", "WC: 26"], 
+            "CN": ["员工总数：162", "直接员工：113", "间接员工：23", "WC：26"],
+            "PL": ["Całkowite Zatrudnienie: 162", "Bezpośredni BC: 113", "Pośredni BC: 23", "WC: 26"]
+        },
+        surface: { 
+            "EN": ["Total Area: 2,500 sqm", "Occupied Area: 2,500 sqm", "Logistics Area: 63%"], 
+            "ES": ["Área Total: 2,500 m²", "Área Ocupada: 2,500 m²", "Área Logística: 63%"], 
+            "IT": ["Area Totale: 2.500 m²", "Area Occupata: 2.500 m²", "Area Logistica: 63%"], 
+            "CN": ["总面积：2,500 平方米", "占用面积：2,500 平方米", "物流区域：63%"],
+            "PL": ["Powierzchnia Całkowita: 2,500 m²", "Powierzchnia Zajęta: 2,500 m²", "Obszar Logistyczny: 63%"]
+        },
+        narration: {
+            "ES": "Instalación enfocada en la manufactura de Rear Lamps, combinando procesos especializados y operaciones ágiles para apoyar la demanda de la región.",
+            "EN": "Facility focused on Rear Lamp manufacturing, combining specialized processes and agile operations to support regional demand.",
+            "IT": "Struttura focalizzata sulla produzione di fanali posteriori, che combina processi specializzati e operazioni agili per supportare la domanda regionale.",
+            "CN": "专注于尾灯制造的设施，结合专业流程和敏捷运营，以支持该地区的需求。",
+            "PL": "Zakład skoncentrowany na produkcji lamp tylnych, łączący specjalistyczne procesy i zwinne operacje, aby sprostać popytowi w regionie."
+        }
+    },
+    "MTC": { 
+        sectionId: "sec-mtc", tz: "America/Mexico_City", title: "MTC Mexico", location: "Ciudad de México, Mexico", 
+        images: ["Plant/MTC.png", "Plant/MTC1.png"], 
+        videoUrls: ["Video/MTC.mp4"], 
+        customers: ["Stellantis", "Nissan", "Ford"], 
+        capabilities: { 
+            "EN": ["Photometry Lab", "Environmental Lab", "Vibration Testing", "Chemical Lab"], 
+            "ES": ["Laboratorio de Fotometría", "Laboratorio Ambiental", "Pruebas de Vibración", "Laboratorio Químico"], 
+            "IT": ["Laboratorio di Fotometria", "Laboratorio Ambientale", "Test di Vibrazione", "Laboratorio Chimico"], 
+            "CN": ["光度实验室", "环境实验室", "振动测试", "化学实验室"],
+            "PL": ["Laboratorium Fotometrii", "Laboratorium Środowiskowe", "Testy Wibracyjne", "Laboratorium Chemiczne"]
+        },
+        staff: { 
+            "EN": ["Staff WC: 109"], "ES": ["Personal WC: 109"], "IT": ["Personale WC: 109"], "CN": ["员工(WC): 109"], "PL": ["Personel WC: 109"]
+        },
+        surface: { 
+            "EN": ["Total Area: 3,600 sqm", "Certifications: ISO 17025, IATF 16949, TISAX", "SOP: 2022"], 
+            "ES": ["Área Total: 3,600 m²", "Certificaciones: ISO 17025, IATF 16949, TISAX", "SOP: 2022"], 
+            "IT": ["Area Totale: 3.600 m²", "Certificazioni: ISO 17025, IATF 16949, TISAX", "SOP: 2022"], 
+            "CN": ["总面积: 3,600 平方米", "认证: ISO 17025, IATF 16949, TISAX", "SOP: 2022"],
+            "PL": ["Powierzchnia Całkowita: 3,600 m²", "Certyfikaty: ISO 17025, IATF 16949, TISAX", "SOP: 2022"]
+        },
+        narration: {
+            "ES": "Centro técnico especializado en validación, pruebas de laboratorio e ingeniería avanzada, brindando soporte al desarrollo, calidad y lanzamiento de soluciones de iluminación para Norteamérica.",
+            "EN": "Technical center specialized in validation, laboratory testing, and advanced engineering, providing support for the development, quality, and launch of lighting solutions for North America.",
+            "IT": "Centro tecnico specializzato in convalida, test di laboratorio e ingegneria avanzata, che fornisce supporto allo sviluppo, alla qualità e al lancio di soluzioni di illuminazione per il Nord America.",
+            "CN": "专门从事验证、实验室测试和高级工程的技术中心，为北美照明解决方案的开发、质量和发布提供支持。",
+            "PL": "Centrum techniczne specjalizujące się w walidacji, testach laboratoryjnych i zaawansowanej inżynierii, zapewniające wsparcie w zakresie rozwoju, jakości i wprowadzania rozwiązań oświetleniowych na rynek Ameryki Północnej."
+        }
+    },
+    "SOUTHFIELD": { 
+        sectionId: "sec-southfield", tz: "America/Detroit", title: "HC Southfield", location: "Southfield, Michigan, USA", 
+        images: ["Plant/HC.png", "Plant/HC1.png", "Plant/HC2.png", "Plant/HC3.png"], 
+        videoUrls: ["Video/HC.mp4"], 
+        customers: ["Stellantis", "Nissan", "Mercedes", "BMW", "Tesla", "GM", "Ford"],
+        capabilities: { 
+            "EN": ["R&D Regional HUB", "Mechanical Design", "Optics Engineering & Validation", "Project Engineering & Customer Interface"], 
+            "ES": ["Centro Regional de I+D", "Diseño Mecánico", "Ingeniería Óptica y Validación", "Ingeniería de Proyectos e Interfaz de Cliente"], 
+            "IT": ["R&D Regional HUB", "Progettazione Meccanica", "Ingegneria Ottica e Convalida", "Ingegneria di Progetto e Interfaccia Clienti"], 
+            "CN": ["地区研发中心", "机械设计", "光学工程与验证", "项目工程与客户接口"],
+            "PL": ["Regionalne Centrum B&R (HUB)", "Projektowanie Mechaniczne", "Inżynieria i Walidacja Optyki", "Inżynieria Projektu i Relacje z Klientami"]
+        },
+        staff: { 
+            "EN": ["Staff WC: 39"], "ES": ["Personal WC: 39"], "IT": ["Personale WC: 39"], "CN": ["员工(WC): 39"], "PL": ["Personel WC: 39"]
+        },
+        surface: { 
+            "EN": ["Regional Headquarters", "SOP: 2022", "Total Turnover: N/A"], 
+            "ES": ["Sede Regional", "SOP: 2022", "Volumen de Negocio: N/A"], 
+            "IT": ["Sede Regionale", "SOP: 2022", "Fatturato Totale: N/A"], 
+            "CN": ["地区总部", "SOP: 2022", "总营业额: N/A"],
+            "PL": ["Siedziba Regionalna", "SOP: 2022", "Całkowity Obrót: N/A"]
+        },
+        narration: {
+            "ES": "Centro regional de I+D especializado en Diseño Mecánico, Ingeniería Óptica, Validación e Ingeniería de Proyectos, impulsando la innovación en iluminación para Norteamérica.",
+            "EN": "Regional R&D hub specialized in Mechanical Design, Optical Engineering, Validation, and Project Engineering, driving lighting innovation for North America.",
+            "IT": "Centro di ricerca e sviluppo regionale specializzato in Progettazione Meccanica, Ingegneria Ottica, Convalida e Ingegneria di Progetto, che guida l'innovazione dell'illuminazione per il Nord America.",
+            "CN": "专门从事机械设计、光学工程、验证和项目工程的区域研发中心，推动北美照明创新。",
+            "PL": "Regionalne centrum badawczo-rozwojowe specjalizujące się w projektowaniu mechanicznym, inżynierii optycznej, walidacji i inżynierii projektów, napędzające innowacje oświetleniowe dla Ameryki Północnej."
+        }
+    }
+};
+
+let currentLang = 'EN';
+let activePlantId = null;
+let slideInterval; 
+let activeTimeZone = 'America/Detroit'; 
+let activeTimeLabel = 'NA Headquarters (EST)';
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.getElementById('current-lang').innerText = lang;
+    
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18n[lang] && i18n[lang][key]) {
+            el.innerHTML = i18n[lang][key];
+        }
+    });
+    
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (i18n[lang] && i18n[lang][key]) {
+            el.placeholder = i18n[lang][key];
+        }
+    });
+    
+    updateTourUI();
+    
+    if (document.getElementById('details-view').style.display === 'block' && activePlantId) { 
+        openModal(activePlantId); 
+    }
+}
+
+function openModal(plantId) {
+    try {
+        activePlantId = plantId;
+        const data = plantData[plantId];
+        if(!data) return;
+        
+        let cleanTitle = data.title ? data.title.replace(/\s*\(.*?\)\s*/g, '') : plantId;
+        if(document.getElementById("modalTitle")) document.getElementById("modalTitle").innerText = cleanTitle;
+        if(document.getElementById("modalLocation")) document.getElementById("modalLocation").innerText = data.location || "";
+        
+        let surfaceHtml = data.surface[currentLang] ? data.surface[currentLang].map(c => `<li>${c}</li>`).join("") : "";
+        let capsHtml = data.capabilities[currentLang] ? data.capabilities[currentLang].map(c => `<li>${c}</li>`).join("") : "";
+        
+        // ASIGNACIÓN INTELIGENTE DE ÍCONOS DE STAFF
+        let staffHtml = data.staff[currentLang] ? data.staff[currentLang].map(c => {
+            let icon = "";
+            let cLower = c.toLowerCase();
+            
+            if (cLower.includes("indirect") || cLower.includes("pośredni") || cLower.includes("indirectos") || cLower.includes("indiretti") || cLower.includes("间接")) {
+                icon = "<img src='Other/Indeirect.svg' class='inline-icon' alt='Indirect'>";
+            } else if (cLower.includes("direct") || cLower.includes("bezpośredni") || cLower.includes("directos") || cLower.includes("diretti") || cLower.includes("直接")) {
+                icon = "<img src='Other/Direct.svg' class='inline-icon' alt='Direct'>";
+            } else if (cLower.includes("wc") || cLower.includes("white collar")) {
+                icon = "<img src='Other/WC.svg' class='inline-icon' alt='WC'>";
+            } else if (cLower.includes("total") || cLower.includes("całkowite") || cLower.includes("totale") || cLower.includes("总数") || cLower.includes("staff")) {
+                icon = "<img src='Other/Headcount.svg' class='inline-icon' alt='Total'>";
+            }
+            return `<li>${icon} ${c}</li>`;
+        }).join("") : "";
+        
+        if(document.getElementById("modalSurface")) document.getElementById("modalSurface").innerHTML = surfaceHtml;
+        if(document.getElementById("modalCapabilities")) document.getElementById("modalCapabilities").innerHTML = capsHtml;
+        if(document.getElementById("modalStaff")) document.getElementById("modalStaff").innerHTML = staffHtml;
+        
+        const custCard = document.getElementById("modalCustomersCard");
+        if (custCard) {
+            if (plantId === 'SOUTHFIELD' || plantId === 'MTC') {
+                custCard.style.display = 'none';
+            } else {
+                custCard.style.display = 'flex';
+                const custGrid = document.getElementById("modalCustomers");
+                if(custGrid) {
+                    custGrid.innerHTML = (data.customers || []).map(cust => {
+                        let logoSrc = customerLogos[cust] ? customerLogos[cust] : null;
+                        let bgStyle = "";
+                        let innerText = "";
+                        let extraClass = cust === 'Rivian' ? " style='border-color: #E7004C;'" : "";
+                        let comingBadge = cust === 'Rivian' ? `<span class="coming-badge">Coming</span>` : "";
+                        
+                        if(logoSrc) {
+                            bgStyle = `background-image: url('${logoSrc}'); color: transparent;`;
+                        } else {
+                            innerText = cust.charAt(0);
+                        }
+                        
+                        return `
+                        <div class="customer-logo-container" onclick="openLogoLightbox('${cust}')">
+                            <div class="customer-logo" title="${cust}" style="${bgStyle}" ${extraClass}>${innerText}</div>
+                            ${comingBadge}
+                        </div>`;
+                    }).join("");
+                }
+            }
+        }
+        
+        activeTimeZone = data.tz;
+        if(typeof updateClock === 'function') updateClock(); 
+
+        if(typeof slideInterval !== 'undefined') clearInterval(slideInterval); 
+        const heroImgContainer = document.getElementById("modalPlantImage");
+        
+        if(heroImgContainer) {
+            heroImgContainer.innerHTML = ''; 
+            if(data.images && data.images.length > 0) {
+                let validImages = data.images.filter(src => src !== null && src !== undefined && src !== "" && src !== fallbackSVG);
+                if (validImages.length === 0) validImages = [fallbackSVG];
+
+                validImages.forEach((src, idx) => {
+                    let imgEl = document.createElement('div');
+                    imgEl.className = 'slide-bg' + (idx === 0 ? ' active' : '');
+                    imgEl.style.backgroundImage = `url('${src}')`;
+                    heroImgContainer.appendChild(imgEl);
+                });
+                
+                let overlay = document.createElement('div');
+                overlay.className = 'slide-overlay-text';
+                overlay.innerText = 'Facility Overview';
+                heroImgContainer.appendChild(overlay);
+
+                if(validImages.length > 1) {
+                    let currentSlide = 0;
+                    const slides = heroImgContainer.querySelectorAll('.slide-bg');
+                    slideInterval = setInterval(() => {
+                        if(slides[currentSlide]) slides[currentSlide].classList.remove('active');
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        if(slides[currentSlide]) slides[currentSlide].classList.add('active');
+                    }, 3000); 
+                }
+            }
+        }
+        
+        // CONFIGURAR REPRODUCTORES DE VIDEO SECUENCIALES
+        setupSequentialPlayer("modalVideoContainer", data.videoUrls || []);
+        
+        const processGrid = document.getElementById("modalProcessVideos");
+        if(data.processVideos) {
+            processGrid.style.display = "grid";
+            setupSequentialPlayer("player-molding", data.processVideos.molding);
+            setupSequentialPlayer("player-coating", data.processVideos.coating);
+            setupSequentialPlayer("player-assembly", data.processVideos.assembly);
+        } else {
+            processGrid.style.display = "none";
+        }
+        
+        if(document.getElementById('main-view')) document.getElementById('main-view').style.display = 'none';
+        if(document.getElementById('globe-container')) document.getElementById('globe-container').style.display = 'none';
+        if(document.getElementById('local-time-display')) document.getElementById('local-time-display').style.display = 'none'; 
+        if(document.getElementById('footerBlur')) document.getElementById('footerBlur').classList.remove('active'); 
+        
+        if(document.getElementById('details-view')) {
+            document.getElementById('details-view').style.display = 'block';
+            document.documentElement.style.scrollSnapType = 'none';
+            window.scrollTo(0, 0);
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+function updateClock() {
+    try {
+        const now = new Date();
+        const options = { timeZone: activeTimeZone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        const timeString = new Intl.DateTimeFormat('en-US', options).format(now);
+        
+        if(document.getElementById('time-clock')) {
+            document.getElementById('time-clock').innerText = timeString;
+        }
+        if(document.getElementById('time-zone-label')) {
+            document.getElementById('time-zone-label').innerText = activeTimeLabel;
+        }
+        
+        if(document.getElementById('details-view') && document.getElementById('details-view').style.display === 'block') {
+            const shortOptions = { timeZone: activeTimeZone, hour: '2-digit', minute: '2-digit', hour12: true };
+            if(document.getElementById('modalLocalTime')) {
+                document.getElementById('modalLocalTime').innerText = "⌚ " + new Intl.DateTimeFormat('en-US', shortOptions).format(now);
+            }
+        }
+    } catch(e) {}
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+function closeModal(isBackBtn = false) { 
+    if (isBackBtn && activePlantId) {
+        const targetId = plantData[activePlantId].sectionId;
+        instantNavigate(null, targetId);
+    } else {
+        instantNavigate(null, 'sec-hero');
+    }
+}
+
+function toggleSearch() {
+    const input = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('searchClear');
+    const results = document.getElementById('searchResults');
+    
+    if (input) input.classList.toggle('active');
+    
+    if (input && input.classList.contains('active')) {
+        input.focus();
+        if(input.value.length > 0 && clearBtn) clearBtn.classList.add('active');
+    } else {
+        if(input) input.value = '';
+        if(clearBtn) clearBtn.classList.remove('active');
+        if(results) results.classList.remove('active');
+    }
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+    const term = this.value.toLowerCase();
+    const clearBtn = document.getElementById('searchClear');
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if(term.length > 0) {
+        if(clearBtn) clearBtn.classList.add('active');
+        let html = '';
+        for(let key in plantData) {
+            const pd = plantData[key];
+            const searchableText = (pd.title + " " + pd.location + " " + pd.capabilities[currentLang].join(" ") + " " + pd.customers.join(" ")).toLowerCase();
+            
+            if(searchableText.includes(term)) {
+                html += `<div class="search-result-item" onclick="goToSearchResult('${pd.sectionId}', '${key}')">
+                            <h4>${pd.title}</h4>
+                            <p>${pd.location}</p>
+                         </div>`;
+            }
+        }
+        if(html === '') html = `<div class="search-result-item"><p style="text-align:center;">No results found.</p></div>`;
+        if(resultsDiv) {
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.add('active');
+        }
+    } else {
+        if(clearBtn) clearBtn.classList.remove('active');
+        if(resultsDiv) resultsDiv.classList.remove('active');
+    }
+});
+
+function goToSearchResult(sectionId, plantId) {
+    if(document.getElementById('searchResults')) document.getElementById('searchResults').classList.remove('active');
+    if(document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
+    if(document.getElementById('searchClear')) document.getElementById('searchClear').classList.remove('active');
+    
+    instantNavigate(null, sectionId);
+    setTimeout(() => { openModal(plantId); }, 100);
+}
+
+function clearSearch() {
+    if(document.getElementById('searchInput')) {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('searchInput').focus();
+    }
+    if(document.getElementById('searchClear')) document.getElementById('searchClear').classList.remove('active');
+    if(document.getElementById('searchResults')) document.getElementById('searchResults').classList.remove('active');
+}
+
+window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scrollTopBtn');
+    if (btn) {
+        if(window.scrollY > window.innerHeight / 2) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    }
+});
+
+function openLogoLightbox(custName) {
+    try {
+        const logoSrc = customerLogos[custName] ? customerLogos[custName] : null;
+        const content = document.getElementById('logo-lightbox-img');
+        const title = document.getElementById('logo-lightbox-title');
+        
+        let displayName = custName;
+        if (custName === 'Rivian') displayName = 'Rivian (Coming Soon)';
+        if(title) title.innerText = displayName;
+        
+        if (content) {
+            if (logoSrc) {
+                content.style.backgroundImage = `url('${logoSrc}')`;
+                content.innerText = '';
+            } else {
+                content.style.backgroundImage = 'none';
+                content.innerText = custName.charAt(0);
+            }
+        }
+        if(document.getElementById('logo-lightbox')) document.getElementById('logo-lightbox').classList.add('active');
+    } catch (e) {
+        console.warn(e);
+    }
+}
+
+function closeLogoLightbox() {
+    if(document.getElementById('logo-lightbox')) document.getElementById('logo-lightbox').classList.remove('active');
+}
+
+// ==========================================
+// CONTROL DE TOUR AUTOMÁTICO
+// ==========================================
+let tourState = 'IDLE'; 
+let currentTourIndex = 0;
+let isModalPhase = false; 
+let currentUtterance = null; 
+let modalStartTime = 0;
+
+const tourStops = [
+    { type: 'section', id: 'sec-hero' },
+    { type: 'section', id: 'sec-footprint' },
+    { type: 'section', id: 'sec-countries' },
+    { type: 'plant', id: 'sec-pulaski', plantId: 'ALUS-PU' },
+    { type: 'plant', id: 'sec-southfield', plantId: 'SOUTHFIELD' },
+    { type: 'plant', id: 'sec-juarez1', plantId: 'ALMX-JU1' },
+    { type: 'plant', id: 'sec-juarez2', plantId: 'ALMX-JU2' }, // AHORA RIVIAN SALTA AQUÍ
+    { type: 'plant', id: 'sec-toluca', plantId: 'ALMX-TO' },
+    { type: 'plant', id: 'sec-tepotzotlan', plantId: 'ALMX-TE' },
+    { type: 'plant', id: 'sec-mtc', plantId: 'MTC' },
+    { type: 'section', id: 'sec-vision' }
+];
+
+function getBestVoice(langCode) {
+    if(typeof window.speechSynthesis === 'undefined') return null;
+    let voices = window.speechSynthesis.getVoices();
+    if(voices.length === 0) return null;
+    let langVoices = voices.filter(v => v.lang.startsWith(langCode));
+    let best = langVoices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium') || v.name.includes('Neural'));
+    return best || langVoices[0] || voices[0];
+}
+
+if(typeof window.speechSynthesis !== 'undefined') {
+    window.speechSynthesis.onvoiceschanged = function() {
+        window.speechSynthesis.getVoices();
+    };
+}
+
+function updateTourUI() {
+    const playBtn = document.getElementById('tourPlayPauseBtn');
+    const playIcon = document.getElementById('tourPlayIcon');
+    const btnText = document.getElementById('tourBtnText');
+    const stopBtn = document.getElementById('tourStopBtn');
+    
+    if(!playBtn) return;
+    
+    if (tourState === 'IDLE') {
+        playBtn.classList.remove('active');
+        if(stopBtn) stopBtn.style.display = 'none';
+        if(btnText) btnText.innerText = i18n[currentLang]["btn_start_tour"];
+        if(playIcon) playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; 
+        const bgm = document.getElementById('tour-bgm');
+        if(bgm) { bgm.pause(); bgm.currentTime = 0; }
+    } else if (tourState === 'PLAYING') {
+        playBtn.classList.add('active');
+        if(stopBtn) stopBtn.style.display = 'flex';
+        if(btnText) btnText.innerText = i18n[currentLang]["btn_pause_tour"];
+        if(playIcon) playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; 
+        const bgm = document.getElementById('tour-bgm');
+        if(bgm) { bgm.volume = 0.1; bgm.play().catch(e=>{}); }
+    } else if (tourState === 'PAUSED') {
+        if(btnText) btnText.innerText = i18n[currentLang]["btn_resume_tour"];
+        if(playIcon) playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; 
+        const bgm = document.getElementById('tour-bgm');
+        if(bgm) bgm.pause();
+    }
+}
+
+function toggleTourPlayPause() {
+    if (tourState === 'IDLE') {
+        if(document.getElementById('details-view') && document.getElementById('details-view').style.display === 'block') {
+            closeModal(true);
+        }
+        
+        tourState = 'PLAYING';
+        currentTourIndex = 0;
+        isModalPhase = false;
+        
+        instantNavigate(null, 'sec-hero');
+        updateTourUI();
+        
+        setTimeout(playNextTourStep, 1000);
+        
+    } else if (tourState === 'PLAYING') {
+        tourState = 'PAUSED';
+        if(typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.pause();
+        updateTourUI();
+        
+    } else if (tourState === 'PAUSED') {
+        tourState = 'PLAYING';
+        if(typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.resume();
+        updateTourUI();
+    }
+}
+
+function stopTour() {
+    tourState = 'IDLE';
+    if(typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.cancel();
+    if(isModalPhase && document.getElementById('details-view') && document.getElementById('details-view').style.display === 'block') {
+        closeLogoLightbox();
+        closeModal(true);
+    }
+    updateTourUI();
+    document.documentElement.style.scrollSnapType = 'y mandatory';
+}
+
+function playNextTourStep() {
+    if(tourState !== 'PLAYING' || typeof window.speechSynthesis === 'undefined') return;
+    
+    if(currentTourIndex >= tourStops.length) {
+        stopTour(); 
+        return;
+    }
+
+    const step = tourStops[currentTourIndex];
+    const section = document.getElementById(step.id);
+    
+    if (!isModalPhase && tourState === 'PLAYING') {
+        instantNavigate(null, step.id);
+    }
+
+    setTimeout(() => {
+        if(tourState !== 'PLAYING') return;
+        
+        let textToRead = "";
+        let rivianPhase = false; 
+        
+        if (step.id === 'sec-hero') {
+            if(currentLang === 'ES') textToRead = 'Bienvenido a Marelli Norteamérica. A continuación, iniciaremos un recorrido automático por nuestra huella de manufactura.';
+            else if(currentLang === 'PL') textToRead = 'Witamy w Marelli Ameryka Północna. Rozpoczniemy teraz automatyczną wycieczkę po naszych zakładach produkcyjnych.';
+            else textToRead = 'Welcome to Marelli North America. We will now begin an automatic tour of our manufacturing footprint.';
+        } else if (step.id === 'sec-footprint') {
+            if(currentLang === 'ES') textToRead = 'Nuestra huella se compone de 5 plantas de ensamblaje, 1 oficina y 1 centro tecnológico, sumando casi cuatro mil empleados.';
+            else if(currentLang === 'PL') textToRead = 'Nasz zasięg obejmuje 5 zakładów montażowych, 1 biuro i 1 centrum technologiczne, zatrudniając prawie cztery tysiące pracowników.';
+            else textToRead = 'Our footprint consists of 5 assembly plants, 1 office, and 1 tech center, with nearly four thousand employees.';
+        } else if (step.id === 'sec-countries') {
+            if(currentLang === 'ES') textToRead = 'Ubicaciones estratégicas que impulsan el sector automotriz con tecnología de punta.';
+            else if(currentLang === 'PL') textToRead = 'Strategiczne lokalizacje napędzające sektor motoryzacyjny dzięki najnowocześniejszym technologiom.';
+            else textToRead = 'Strategic locations powering the automotive sector with cutting-edge technology.';
+        } else if (step.id === 'sec-vision') {
+            if(currentLang === 'ES') textToRead = 'Finalmente, llegamos a nuestra visión AHEAD 2031. Para más información, por favor reproduzca el video oficial ubicado en esta última sección.';
+            else if(currentLang === 'PL') textToRead = 'Na koniec docieramy do naszej wizji AHEAD 2031. Aby dowiedzieć się więcej, odtwórz oficjalny film znajdujący się w tej ostatniej sekcji.';
+            else if(currentLang === 'IT') textToRead = "Infine, arriviamo alla nostra visione AHEAD 2031. Per maggiori informazioni, riproduci il video ufficiale situato in quest'ultima sezione.";
+            else if(currentLang === 'CN') textToRead = "最后，我们来到了 AHEAD 2031 愿景。如需了解更多信息，请播放本节的官方视频。";
+            else textToRead = 'Finally, we reach our AHEAD 2031 vision. For more information, please play the official video located in this final section.';
+        } else if (step.type === 'plant' && !isModalPhase) {
+            const plantInfo = plantData[step.plantId];
+            let friendlyName = plantInfo.title;
+            let match = friendlyName.match(/\((.*?)\)/);
+            if (match) friendlyName = match[1]; 
+
+            let subtitle = section ? section.querySelector('.subtitle') : null;
+            let pElems = section ? section.querySelectorAll('p') : [];
+            let loc = pElems[0] ? pElems[0].innerText : "";
+            let type = subtitle ? subtitle.innerText : "";
+            let desc = pElems[1] ? pElems[1].innerText : "";
+            
+            if (step.plantId === 'MTC') {
+                textToRead = friendlyName + " ... " + loc + " ... " + type + " ... " + desc + ".";
+            } else {
+                textToRead = loc + " ... " + type + " ... " + desc + ".";
+            }
+        } else if (step.type === 'plant' && isModalPhase) {
+            modalStartTime = Date.now(); 
+            openModal(step.plantId);
+            const plantInfo = plantData[step.plantId];
+            
+            if(plantInfo && plantInfo.narration && plantInfo.narration[currentLang]) {
+                textToRead = plantInfo.narration[currentLang];
+            }
+        }
+
+        window.speechSynthesis.cancel();
+        currentUtterance = new SpeechSynthesisUtterance(textToRead);
+        
+        let langMap = { "EN": "en-US", "ES": "es-MX", "IT": "it-IT", "CN": "zh-CN", "PL": "pl-PL" };
+        let targetLangCode = langMap[currentLang] || "en-US";
+        
+        currentUtterance.lang = targetLangCode;
+        currentUtterance.rate = 1.0; 
+        
+        let bestVoice = getBestVoice(targetLangCode.substring(0, 2));
+        if(bestVoice) { currentUtterance.voice = bestVoice; }
+
+        function finishModalPhase() {
+            let elapsed = Date.now() - modalStartTime;
+            let delayRemaining = Math.max(0, 10000 - elapsed); 
+            
+            setTimeout(() => {
+                if (tourState === 'PLAYING') { 
+                    closeLogoLightbox(); 
+                    
+                    isModalPhase = false;
+                    currentTourIndex++;
+                    
+                    if (currentTourIndex < tourStops.length) {
+                        instantNavigate(null, tourStops[currentTourIndex].id);
+                        setTimeout(playNextTourStep, 600); 
+                    } else {
+                        stopTour();
+                    }
+                }
+            }, delayRemaining);
+        }
+
+        currentUtterance.onend = () => {
+            if(tourState === 'PLAYING') {
+                if(step.type === 'plant' && !isModalPhase) {
+                    isModalPhase = true;
+                    setTimeout(playNextTourStep, 400); 
+                // AHORA EL EVENTO DE RIVIAN SE ACTIVA EN JUÁREZ II (ALMX-JU2)
+                } else if (step.type === 'plant' && isModalPhase && step.plantId === 'ALMX-JU2' && !rivianPhase) {
+                    
+                    rivianPhase = true;
+                    openLogoLightbox('Rivian');
+                    
+                    let rivianText = "Additionally, we have a new brand project with Rivian on the way.";
+                    if(currentLang === 'ES') rivianText = "Además, tenemos un nuevo proyecto de marca con Rivian en camino.";
+                    if(currentLang === 'PL') rivianText = "Dodatkowo, mamy w drodze nowy projekt marki z firmą Rivian.";
+                    if(currentLang === 'IT') rivianText = "Inoltre, abbiamo un nuovo progetto di marchio con Rivian in arrivo.";
+                    if(currentLang === 'CN') rivianText = "此外，我们还有一个新的 Rivian 品牌项目正在进行中。";
+                    
+                    let rivianUtterance = new SpeechSynthesisUtterance(rivianText);
+                    rivianUtterance.lang = targetLangCode;
+                    rivianUtterance.rate = 1.0; 
+                    if(bestVoice) { rivianUtterance.voice = bestVoice; }
+                    
+                    rivianUtterance.onend = () => { if(tourState === 'PLAYING') finishModalPhase(); };
+                    rivianUtterance.onerror = () => { if(tourState === 'PLAYING') finishModalPhase(); };
+                    
+                    window.speechSynthesis.speak(rivianUtterance);
+                    currentUtterance = rivianUtterance;
+                } else {
+                    if(isModalPhase) {
+                        finishModalPhase();
+                    } else {
+                        currentTourIndex++;
+                        setTimeout(playNextTourStep, 600); 
+                    }
+                }
+            }
+        };
+        
+        currentUtterance.onerror = (e) => {
+            console.warn("Speech error, moving next", e);
+            if(tourState === 'PLAYING') {
+                closeLogoLightbox();
+                isModalPhase = false;
+                currentTourIndex++;
+                if (currentTourIndex < tourStops.length) {
+                    instantNavigate(null, tourStops[currentTourIndex].id);
+                }
+                setTimeout(playNextTourStep, 500);
+            }
+        };
+
+        window.speechSynthesis.speak(currentUtterance);
+
+    }, isModalPhase ? 250 : 500); 
+}
+
+// ==========================================
+// MAPA D3 Y EVENTOS
+// ==========================================
+const ENABLE_STATES = true; 
+
+document.addEventListener("DOMContentLoaded", () => {
+    if(typeof d3 === 'undefined') return;
+
+    const width = 500; 
+    const height = 500; 
+    const baseScale = 240; 
+    const visibleCountries = ["AFG","AGO","ALB","ARE","ARG","ARM","ATA","ATF","AUS","AUT","AZE","BDI","BEL","BEN","BFA","BGD","BGR","BHS","BIH","BLR","BLZ","BOL","BRA","BRN","BTN","BWA","CAF","CAN","CHE","CHL","CHN","CIV","CMR","COD","COG","COL","CRI","CUB","CYP","CZE","DEU","DJI","DNK","DOM","DZA","ECU","EGY","ERI","ESH","ESP","EST","ETH","FIN","FJI","FLK","FRA","GUF","GAB","GBR","GEO","GHA","GIN","GMB","GNB","GNQ","GRC","GRL","GTM","GUY","HND","HRV","HTI","HUN","IDN","IND","IRL","IRN","IRQ","ISL","ISR","ITA","JAM","JOR","JPN","KAZ","KEN","KGZ","KHM","KOR","KWT","LAO","LBN","LBR","LBY","LKA","LSO","LTU","LUX","LVA","MAR","MDA","MDG","MEX","MKD","MLI","MMR","MNE","MNG","MOZ","MRT","MWI","MYS","NAM","NCL","NER","NGA","NIC","NLD","NOR","NPL","NZL","OMN","PAK","PAN","PER","PHL","PNG","POL","PRI","PRK","PRT","PRY","PSE","QAT","ROU","RUS","RWA","SAU","SDN","SDS","SEN","SLB","SLE","SLV","SOM","SRB","SUR","SVK","SVN","SWE","SWZ","SYR","TCD","TGO","THA","TJK","TKM","TLS","TTO","TUN","TUR","TWN","TZA","UGA","UKR","URY","USA","UZB","VEN","VNM","VUT","YEM","ZAF","ZMB","ZWE"];
+    
+    // OCÉANO BLANCO SÓLIDO
+    const colorOcean = "#FFFFFF"; 
+    const colorLand = "#002855"; 
+    const colorActive = "#00A6E7";      
+
+    const svg = d3.select("#globe").append("svg").attr("width", width).attr("height", height);
+    const defs = svg.append("defs");
+    defs.append("clipPath").attr("id", "circleClip").append("circle").attr("cx", width/2).attr("cy", height/2).attr("r", baseScale);
+
+    svg.append("circle")
+        .attr("cx", width/2)
+        .attr("cy", height/2)
+        .attr("r", baseScale)
+        .attr("fill", colorOcean)
+        .attr("stroke", "rgba(0,0,0,0.15)")
+        .attr("stroke-width", "1px");
+
+    let mapGroup = svg.append("g").attr("clip-path", "url(#circleClip)");
+    let statesGroup = svg.append("g").attr("clip-path", "url(#circleClip)").style("opacity", 0); 
+    
+    let projection = d3.geoOrthographic().scale(baseScale).center([0, 0]).translate([width/2, height/2]).clipAngle(90).rotate([95, -38]); 
+    let path = d3.geoPath().projection(projection);
+    let mapReady = false;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            
+            if (entry.target.id === 'sec-footer') {
+                if (entry.isIntersecting && document.getElementById('main-view').style.display !== 'none') {
+                    document.getElementById('footerBlur').classList.add('active');
+                    document.getElementById('local-time-display').classList.remove('visible');
+                } else {
+                    document.getElementById('footerBlur').classList.remove('active');
+                }
+            }
+
+            if (entry.isIntersecting) {
+                
+                document.querySelectorAll('.main-nav a').forEach(a => a.classList.remove('active'));
+                document.querySelectorAll('.dropdown-menu a').forEach(a => a.classList.remove('active'));
+                
+                const activeLink = document.querySelector(`.main-nav a[href="#${entry.target.id}"]`);
+                if(activeLink) {
+                    activeLink.classList.add('active');
+                    const parentMenu = activeLink.closest('.nav-item');
+                    if(parentMenu) parentMenu.querySelector('a').classList.add('active');
+                }
+
+                const targetTz = entry.target.getAttribute('data-tz');
+                const targetTzLabel = entry.target.getAttribute('data-tzlabel');
+                const clockWidget = document.getElementById('local-time-display');
+                
+                if (targetTz && targetTzLabel && document.getElementById('main-view').style.display !== 'none') {
+                    activeTimeZone = targetTz;
+                    activeTimeLabel = targetTzLabel;
+                    clockWidget.classList.add('visible');
+                } else if (['sec-hero', 'sec-footprint', 'sec-countries', 'sec-vision'].includes(entry.target.id)) {
+                    activeTimeZone = 'America/Detroit';
+                    activeTimeLabel = 'NA Headquarters (EST)';
+                    if(entry.target.id !== 'sec-footer') clockWidget.classList.add('visible');
+                }
+                
+                if(typeof updateClock === 'function') updateClock();
+
+                if (mapReady) {
+                    const lat = parseFloat(entry.target.getAttribute('data-lat'));
+                    const lon = parseFloat(entry.target.getAttribute('data-lon'));
+                    const zoom = parseFloat(entry.target.getAttribute('data-zoom')) * baseScale;
+                    const targetCountry = entry.target.getAttribute('data-country'); 
+                    const labelText = entry.target.getAttribute('data-label');
+                    
+                    if (!isNaN(lat) && !isNaN(lon)) {
+                        const hideStates = !ENABLE_STATES || (targetCountry === "NONE" || targetCountry === "USA,MEX");
+                        
+                        statesGroup.interrupt("opacityTrans").transition("opacityTrans").duration(800).style("opacity", hideStates ? 0 : 1);
+
+                        mapGroup.selectAll(".country").interrupt("colorTrans").transition("colorTrans").duration(800)
+                            .style("fill", d => {
+                                if (!visibleCountries.includes(d.id)) return "transparent";
+                                if (targetCountry === "NONE") return colorLand;
+                                return targetCountry.includes(d.id) ? colorActive : colorLand;
+                            });
+
+                        svg.interrupt("globeMove").transition("globeMove").duration(1200).tween("rotate", function() {
+                            const r = d3.interpolate(projection.rotate(), [-lon, -lat, 0]);
+                            const s = d3.interpolate(projection.scale(), zoom);
+                            return function(t) {
+                                projection.rotate(r(t)); 
+                                projection.scale(s(t));
+                                mapGroup.selectAll("path.country").attr("d", path);
+                                statesGroup.selectAll("path.state-boundary").attr("d", path); 
+                            }
+                        });
+
+                        const pinContainer = document.getElementById('pinContainer');
+                        const pinLabel = document.getElementById('pinLabel');
+                        if (labelText) {
+                            pinLabel.innerText = labelText; 
+                            pinContainer.style.opacity = '1';
+                        } else { 
+                            pinContainer.style.opacity = '0'; 
+                        }
+                    }
+                }
+            }
+        });
+    }, { threshold: 0.6 }); 
+    
+    document.querySelectorAll('.panel').forEach(section => observer.observe(section));
+
+    Promise.all([
+        d3.json("https://cdn.jsdelivr.net/gh/johan/world.geo.json@master/countries.geo.json"),
+        d3.json("https://cdn.jsdelivr.net/gh/PublicaMundi/MappingAPI@master/data/geojson/us-states.json"),
+        d3.json("https://cdn.jsdelivr.net/gh/codeforamerica/click_that_hood@master/public/data/mexico.geojson")
+    ]).then(([worldData, usData, mxData]) => {
+        
+        mapGroup.selectAll("path.country").data(worldData.features).enter().append("path").attr("class", "country").attr("d", path)
+            .style("fill", d => visibleCountries.includes(d.id) ? colorLand : "transparent")
+            .style("stroke", d => visibleCountries.includes(d.id) ? "#FFFFFF" : "none")
+            .style("stroke-width", "0.6px"); 
+
+        statesGroup.selectAll("path.us-state").data(usData.features).enter().append("path").attr("class", "state-boundary us-state").attr("d", path)
+            .style("fill", "none")
+            .style("stroke", "rgba(255,255,255,0.25)")
+            .style("stroke-width", "0.4px")
+            .style("pointer-events", "none");
+
+        statesGroup.selectAll("path.mx-state").data(mxData.features).enter().append("path").attr("class", "state-boundary mx-state").attr("d", path)
+            .style("fill", "none")
+            .style("stroke", "rgba(255,255,255,0.25)")
+            .style("stroke-width", "0.4px")
+            .style("pointer-events", "none");
+
+        mapReady = true;
+
+    }).catch(err => console.warn("D3 API Request Error.", err));
+});
+
+// ==========================================
+// FORZAR SIEMPRE EL INICIO EN LA PORTADA AL RECARGAR
+// ==========================================
+window.addEventListener('load', function() {
+    if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+    }
+    document.documentElement.style.scrollSnapType = 'none';
+    window.scrollTo(0, 0);
+    
+    if (window.location.hash) {
+        history.replaceState(null, null, window.location.pathname + window.location.search);
+    }
+    
+    setTimeout(() => {
+        document.documentElement.style.scrollSnapType = 'y mandatory';
+    }, 150);
+});
+</script>
+</body>
+</html>
